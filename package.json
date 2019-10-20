@@ -1,0 +1,14 @@
+{
+  "name": "moon",
+  "private": true,
+  "scripts": {
+    "start": "webpack-dev-server"
+  },
+  "dependencies": {
+    "@rails/webpacker": "^4.0.7"
+  },
+  "devDependencies": {
+    "postcss-nested": "^4.1.2",
+    "webpack-dev-server": "^3.8.2"
+  }
+}
