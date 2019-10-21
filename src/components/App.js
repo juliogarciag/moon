@@ -1,7 +1,6 @@
 import React from "react";
 import { ApolloProvider, useQuery } from "@apollo/react-hooks";
-import ApolloClient from "apollo-boost";
-import { gql } from "apollo-boost";
+import ApolloClient, { gql } from "apollo-boost";
 
 const client = new ApolloClient({
   uri: "http://localhost:3000/graphql"
