@@ -1,21 +1,8 @@
 import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import { useMutation } from "@apollo/react-hooks";
-import { gql } from "apollo-boost";
 import "react-datepicker/dist/react-datepicker.css";
-
-const UPDATE_DATE_MUTATION = gql`
-  mutation UpdateEntryDate($id: ID!, $date: ISO8601Date!) {
-    updateEntry(id: $id, date: $date) {
-      entry {
-        id
-        description
-        amountCents
-        date
-      }
-    }
-  }
-`;
+import updateDateMutation from "./updateEntryDate.graphql";
 
 function DateCell({
   cell: { value: initialValue },
@@ -24,7 +11,7 @@ function DateCell({
   }
 }) {
   const [date, setDate] = useState(() => new Date(initialValue));
-  const [updateDate] = useMutation(UPDATE_DATE_MUTATION);
+  const [updateDate] = useMutation(updateDateMutation);
 
   useEffect(() => {
     setDate(new Date(initialValue));

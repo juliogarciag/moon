@@ -1,0 +1,8 @@
+{
+  entries {
+    id
+    description
+    date
+    amountCents
+  }
+}

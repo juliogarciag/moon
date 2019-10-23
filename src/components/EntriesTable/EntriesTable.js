@@ -3,6 +3,8 @@ import { useTable } from "react-table";
 import DescriptionCell from "./DescriptionCell";
 import DateCell from "./DateCell";
 import AmountCentsCell from "./AmountCentsCell";
+import CreateEntryButton from "./CreateEntryButton";
+import DeleteEntryButton from "./DeleteEntryButton";
 
 function EntriesTable({ entries }) {
   const columns = [
@@ -20,6 +22,15 @@ function EntriesTable({ entries }) {
       Header: "Amount",
       accessor: "amountCents",
       Cell: AmountCentsCell
+    },
+    {
+      Header: "Actions",
+      Cell: props => (
+        <>
+          <CreateEntryButton {...props} />
+          <DeleteEntryButton {...props} />
+        </>
+      )
     }
   ];
 

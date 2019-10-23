@@ -1,0 +1,10 @@
+mutation UpdateEntryDescription($id: ID!, $description: String!) {
+  updateEntry(id: $id, description: $description) {
+    entry {
+      id
+      description
+      amountCents
+      date
+    }
+  }
+}

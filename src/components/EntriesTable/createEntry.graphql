@@ -1,0 +1,18 @@
+mutation CreateEntry(
+  $description: String!
+  $amountCents: Int!
+  $date: ISO8601Date!
+) {
+  createEntry(
+    description: $description
+    amountCents: $amountCents
+    date: $date
+  ) {
+    entry {
+      id
+      description
+      amountCents
+      date
+    }
+  }
+}
