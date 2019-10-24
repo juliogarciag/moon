@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useTable } from "react-table";
+import { useTable, usePagination } from "react-table";
 import DescriptionCell from "./DescriptionCell";
 import DateCell from "./DateCell";
 import AmountCentsCell from "./AmountCentsCell";
@@ -28,77 +28,109 @@ function processEntries(entries) {
 }
 
 function EntriesTable({ entries }) {
-  const columns = [
-    {
-      Header: "Description",
-      accessor: "description",
-      Cell: DescriptionCell
-    },
-    {
-      Header: "Date",
-      accessor: "date",
-      Cell: DateCell
-    },
-    {
-      Header: "Amount",
-      accessor: "amountCents",
-      Cell: AmountCentsCell
-    },
-    {
-      Header: "Total",
-      accessor: "totalCents",
-      Cell: ({ cell: { value } }) => (value / 100).toFixed(2)
-    },
-    {
-      Header: "Actions",
-      Cell: props => (
-        <>
-          <CreateEntryButton {...props} />
-          <DeleteEntryButton {...props} />
-        </>
-      )
-    }
-  ];
+  const columns = useMemo(
+    () => [
+      {
+        Header: "Description",
+        accessor: "description",
+        Cell: DescriptionCell
+      },
+      {
+        Header: "Date",
+        accessor: "date",
+        Cell: DateCell
+      },
+      {
+        Header: "Amount",
+        accessor: "amountCents",
+        Cell: AmountCentsCell
+      },
+      {
+        Header: "Total",
+        accessor: "totalCents",
+        Cell: ({ cell: { value } }) => (value / 100).toFixed(2)
+      },
+      {
+        Header: "Actions",
+        Cell: props => (
+          <>
+            <CreateEntryButton {...props} />
+            <DeleteEntryButton {...props} />
+          </>
+        )
+      }
+    ],
+    []
+  );
 
   const data = useMemo(() => processEntries(entries), [entries]);
+
+  const pageSize = 25;
 
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
-    rows,
-    prepareRow
-  } = useTable({
-    columns,
-    data
-  });
+    prepareRow,
+    pageOptions,
+    page,
+    state: { pageIndex },
+    previousPage,
+    nextPage,
+    canPreviousPage,
+    canNextPage
+  } = useTable(
+    {
+      columns,
+      data,
+      disablePageResetOnDataChange: true,
+      initialState: {
+        pageIndex: data.length / pageSize - 1,
+        pageSize: pageSize
+      }
+    },
+    usePagination
+  );
 
   return (
-    <table {...getTableProps()}>
-      <thead>
-        {headerGroups.map(headerGroup => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map(column => (
-              <th {...column.getHeaderProps()}>{column.render("Header")}</th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-      <tbody {...getTableBodyProps()}>
-        {rows.map(
-          row =>
-            prepareRow(row) || (
-              <tr {...row.getRowProps()}>
-                {row.cells.map(cell => {
-                  return (
-                    <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
-                  );
-                })}
-              </tr>
-            )
-        )}
-      </tbody>
-    </table>
+    <>
+      <table {...getTableProps()}>
+        <thead>
+          {headerGroups.map(headerGroup => (
+            <tr {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map(column => (
+                <th {...column.getHeaderProps()}>{column.render("Header")}</th>
+              ))}
+            </tr>
+          ))}
+        </thead>
+        <tbody {...getTableBodyProps()}>
+          {page.map(
+            row =>
+              prepareRow(row) || (
+                <tr {...row.getRowProps()}>
+                  {row.cells.map(cell => {
+                    return (
+                      <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                    );
+                  })}
+                </tr>
+              )
+          )}
+        </tbody>
+      </table>
+      <div>
+        <button onClick={() => previousPage()} disabled={!canPreviousPage}>
+          Previous Page
+        </button>
+        <button onClick={() => nextPage()} disabled={!canNextPage}>
+          Next Page
+        </button>
+        <div>
+          Page {pageIndex + 1} of {pageOptions.length}
+        </div>
+      </div>
+    </>
   );
 }
 
