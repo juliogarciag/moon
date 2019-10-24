@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import updateAmountCentsMutation from "./updateEntryAmountCents.graphql";
+import styles from "./EntriesTable.module.css";
 
 function AmountCentsCell({
   cell: { value: initialValue },
@@ -29,6 +30,7 @@ function AmountCentsCell({
 
   return (
     <input
+      className={styles.amountCellInput}
       type="number"
       step="0.01"
       value={amountInDecimal}

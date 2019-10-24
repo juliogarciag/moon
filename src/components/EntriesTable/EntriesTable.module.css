@@ -1,0 +1,96 @@
+* {
+  box-sizing: border-box;
+}
+
+.table {
+  font-size: 0.8rem;
+  font-family: "Source Code Pro", monospace;
+  width: 50rem;
+}
+
+.header {
+  border-bottom: 1px solid black;
+}
+
+.headerCell {
+  display: inline-block;
+  font-weight: bold;
+  padding: 0.5rem;
+}
+
+.headerCell--description,
+.dataCell--description {
+  width: 32%;
+}
+
+.headerCell--date,
+.dataCell--date {
+  width: 17%;
+}
+
+.headerCell--amountCents,
+.dataCell--amountCents {
+  width: 17%;
+}
+
+.headerCell--amountCents,
+.headerCell--totalCents,
+.headerCell--actions {
+  text-align: right;
+}
+
+.headerCell--totalCents,
+.dataCell--totalCents {
+  width: 17%;
+}
+
+.headerCell--actions,
+.dataCell--actions {
+  width: 17%;
+}
+
+.data {
+}
+
+.dataRow {
+}
+
+.dataCell {
+  display: inline-block;
+}
+
+.descriptionCellInput {
+  width: 100%;
+  font-size: inherit;
+  font-family: inherit;
+  padding: 0.5rem;
+  height: 100%;
+  border: 0;
+}
+
+.dateCellInput {
+  width: 100%;
+  font-size: inherit;
+  font-family: inherit;
+  padding: 0.5rem;
+  height: 100%;
+  border: 0;
+}
+
+.amountCellInput {
+  width: 100%;
+  font-size: inherit;
+  font-family: inherit;
+  padding: 0.5rem;
+  height: 100%;
+  border: 0;
+  text-align: right;
+}
+
+.dataCell--totalCents {
+  text-align: right;
+}
+
+.dataCell--actions {
+  text-align: right;
+}

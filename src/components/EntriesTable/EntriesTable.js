@@ -1,11 +1,14 @@
 import React, { useMemo } from "react";
 import { useTable, usePagination } from "react-table";
+import { sortBy } from "ramda";
+import classNames from "classnames";
+import numbro from "numbro";
 import DescriptionCell from "./DescriptionCell";
 import DateCell from "./DateCell";
 import AmountCentsCell from "./AmountCentsCell";
 import CreateEntryButton from "./CreateEntryButton";
 import DeleteEntryButton from "./DeleteEntryButton";
-import { sortBy } from "ramda";
+import styles from "./EntriesTable.module.css";
 
 const sortEntries = sortBy(entry => new Date(entry.date));
 
@@ -48,10 +51,16 @@ function EntriesTable({ entries }) {
       {
         Header: "Total",
         accessor: "totalCents",
-        Cell: ({ cell: { value } }) => (value / 100).toFixed(2)
+        Cell: ({ cell: { value } }) =>
+          numbro(value / 100).formatCurrency({
+            average: false,
+            thousandSeparated: true,
+            mantissa: 2
+          })
       },
       {
         Header: "Actions",
+        id: "actions",
         Cell: props => (
           <>
             <CreateEntryButton {...props} />
@@ -94,31 +103,51 @@ function EntriesTable({ entries }) {
 
   return (
     <>
-      <table {...getTableProps()}>
-        <thead>
+      <div {...getTableProps()} className={styles.table}>
+        <div className={styles.header}>
           {headerGroups.map(headerGroup => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
+            <div
+              {...headerGroup.getHeaderGroupProps()}
+              className={styles.headerRow}
+            >
               {headerGroup.headers.map(column => (
-                <th {...column.getHeaderProps()}>{column.render("Header")}</th>
+                <div
+                  {...column.getHeaderProps()}
+                  className={classNames(
+                    styles.headerCell,
+                    styles[`headerCell--${column.id}`]
+                  )}
+                >
+                  {column.render("Header")}
+                </div>
               ))}
-            </tr>
+            </div>
           ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {page.map(
-            row =>
+        </div>
+        <div {...getTableBodyProps()} className={styles.data}>
+          {page.map(row => {
+            return (
               prepareRow(row) || (
-                <tr {...row.getRowProps()}>
+                <div {...row.getRowProps()} className={styles.dataRow}>
                   {row.cells.map(cell => {
                     return (
-                      <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                      <div
+                        {...cell.getCellProps()}
+                        className={classNames(
+                          styles.dataCell,
+                          styles[`dataCell--${cell.column.id}`]
+                        )}
+                      >
+                        {cell.render("Cell")}
+                      </div>
                     );
                   })}
-                </tr>
+                </div>
               )
-          )}
-        </tbody>
-      </table>
+            );
+          })}
+        </div>
+      </div>
       <div>
         <button onClick={() => previousPage()} disabled={!canPreviousPage}>
           Previous Page

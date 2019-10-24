@@ -3,6 +3,7 @@ import DatePicker from "react-datepicker";
 import { useMutation } from "@apollo/react-hooks";
 import "react-datepicker/dist/react-datepicker.css";
 import updateDateMutation from "./updateEntryDate.graphql";
+import styles from "./EntriesTable.module.css";
 
 function DateCell({
   cell: { value: initialValue },
@@ -21,7 +22,14 @@ function DateCell({
     updateDate({ variables: { id: entryId, date: date.toISOString() } });
   };
 
-  return <DatePicker selected={date} onChange={setDate} onBlur={handleBlur} />;
+  return (
+    <DatePicker
+      className={styles.dateCellInput}
+      selected={date}
+      onChange={setDate}
+      onBlur={handleBlur}
+    />
+  );
 }
 
 export default DateCell;

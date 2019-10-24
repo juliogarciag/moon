@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import updateDescriptionMutation from "./updateEntryDescription.graphql";
+import styles from "./EntriesTable.module.css";
 
 function DescriptionCell({
   cell: { value: initialValue },
@@ -23,7 +24,14 @@ function DescriptionCell({
     updateDescription({ variables: { id: entryId, description: value } });
   };
 
-  return <input value={value} onChange={handleChange} onBlur={handleBlur} />;
+  return (
+    <input
+      className={styles.descriptionCellInput}
+      value={value}
+      onChange={handleChange}
+      onBlur={handleBlur}
+    />
+  );
 }
 
 export default DescriptionCell;

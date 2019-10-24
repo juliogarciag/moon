@@ -29,7 +29,7 @@ function CreateEntryButton({ row: { original } }) {
     });
   };
 
-  return <button onClick={handleCreate}>Create Entry</button>;
+  return <button onClick={handleCreate}>Add Entry</button>;
 }
 
 export default CreateEntryButton;

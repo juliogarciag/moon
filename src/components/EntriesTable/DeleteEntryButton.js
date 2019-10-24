@@ -25,7 +25,7 @@ function DeleteEntryButton({ row: { original } }) {
     deleteEntry({ variables: { id: original.id } });
   };
 
-  return <button onClick={handleDelete}>Delete Entry</button>;
+  return <button onClick={handleDelete}>Delete</button>;
 }
 
 export default DeleteEntryButton;
