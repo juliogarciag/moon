@@ -49,34 +49,16 @@
   width: 17%;
 }
 
-.data {
-}
-
 .dataRow {
+  border-bottom: 1px solid #999;
 }
 
 .dataCell {
   display: inline-block;
 }
 
-.descriptionCellInput {
-  width: 100%;
-  font-size: inherit;
-  font-family: inherit;
-  padding: 0.5rem;
-  height: 100%;
-  border: 0;
-}
-
-.dateCellInput {
-  width: 100%;
-  font-size: inherit;
-  font-family: inherit;
-  padding: 0.5rem;
-  height: 100%;
-  border: 0;
-}
-
+.descriptionCellInput,
+.dateCellInput,
 .amountCellInput {
   width: 100%;
   font-size: inherit;
@@ -84,13 +66,19 @@
   padding: 0.5rem;
   height: 100%;
   border: 0;
-  text-align: right;
+  border-left: 2px solid transparent;
+  border-right: 1px solid transparent;
+  outline: none;
+
+  &:focus {
+    border-left-color: black;
+    border-right-color: black;
+    background-color: #fbfec2;
+  }
 }
 
-.dataCell--totalCents {
-  text-align: right;
-}
-
+.amountCellInput,
+.dataCell--totalCents,
 .dataCell--actions {
   text-align: right;
 }
