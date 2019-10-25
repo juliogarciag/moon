@@ -1,5 +1,7 @@
-import React, { useMemo, useRef } from "react";
-import { useTable, usePagination } from "react-table";
+import React, { useMemo, useRef, useCallback } from "react";
+import { useTable } from "react-table";
+import { FixedSizeList } from "react-window";
+import useWindowSize from "./useWindowSize";
 import { sortBy } from "ramda";
 import classNames from "classnames";
 import numbro from "numbro";
@@ -107,92 +109,78 @@ function EntriesTable({ entries }) {
 
   const data = useMemo(() => processEntries(entries), [entries]);
 
-  const pageSize = 25;
-
   const {
+    rows,
     getTableProps,
     getTableBodyProps,
     headerGroups,
-    prepareRow,
-    pageOptions,
-    page,
-    state: { pageIndex },
-    previousPage,
-    nextPage,
-    canPreviousPage,
-    canNextPage
-  } = useTable(
-    {
-      columns,
-      data,
-      disablePageResetOnDataChange: true,
-      initialState: {
-        pageIndex: data.length / pageSize - 1,
-        pageSize: pageSize
-      }
-    },
-    usePagination
-  );
+    prepareRow
+  } = useTable({
+    columns,
+    data
+  });
 
-  return (
-    <>
-      <div {...getTableProps()} className={styles.table}>
-        <div className={styles.header}>
-          {headerGroups.map(headerGroup => (
-            <div
-              {...headerGroup.getHeaderGroupProps()}
-              className={styles.headerRow}
-            >
-              {headerGroup.headers.map(column => (
-                <div
-                  {...column.getHeaderProps()}
-                  className={classNames(
-                    styles.headerCell,
-                    styles[`headerCell--${column.id}`]
-                  )}
-                >
-                  {column.render("Header")}
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-        <div {...getTableBodyProps()} className={styles.data}>
-          {page.map(row => {
+  const renderRow = useCallback(({ index, style }) => {
+    const row = rows[index];
+    return (
+      prepareRow(row) || (
+        <div {...row.getRowProps({ style })} className={styles.dataRow}>
+          {row.cells.map(cell => {
             return (
-              prepareRow(row) || (
-                <div {...row.getRowProps()} className={styles.dataRow}>
-                  {row.cells.map(cell => {
-                    return (
-                      <div
-                        {...cell.getCellProps()}
-                        className={classNames(
-                          styles.dataCell,
-                          styles[`dataCell--${cell.column.id}`]
-                        )}
-                      >
-                        {cell.render("Cell")}
-                      </div>
-                    );
-                  })}
-                </div>
-              )
+              <div
+                {...cell.getCellProps()}
+                className={classNames(
+                  styles.dataCell,
+                  styles[`dataCell--${cell.column.id}`]
+                )}
+              >
+                {cell.render("Cell")}
+              </div>
             );
           })}
         </div>
+      )
+    );
+  });
+
+  const windowSize = useWindowSize();
+  const tableHeight = useMemo(() => {
+    const headerHeight = 49;
+    return windowSize.innerHeight - headerHeight;
+  }, [windowSize]);
+
+  return (
+    <div {...getTableProps()} className={styles.table}>
+      <div className={styles.header}>
+        {headerGroups.map(headerGroup => (
+          <div
+            {...headerGroup.getHeaderGroupProps()}
+            className={styles.headerRow}
+          >
+            {headerGroup.headers.map(column => (
+              <div
+                {...column.getHeaderProps()}
+                className={classNames(
+                  styles.headerCell,
+                  styles[`headerCell--${column.id}`]
+                )}
+              >
+                {column.render("Header")}
+              </div>
+            ))}
+          </div>
+        ))}
       </div>
-      <div>
-        <button onClick={() => previousPage()} disabled={!canPreviousPage}>
-          Previous Page
-        </button>
-        <button onClick={() => nextPage()} disabled={!canNextPage}>
-          Next Page
-        </button>
-        <div>
-          Page {pageIndex + 1} of {pageOptions.length}
-        </div>
+      <div {...getTableBodyProps()} className={styles.data}>
+        <FixedSizeList
+          height={tableHeight}
+          itemCount={rows.length}
+          itemSize={35}
+        >
+          {renderRow}
+        </FixedSizeList>
       </div>
-    </>
+    </div>
   );
 }
 
