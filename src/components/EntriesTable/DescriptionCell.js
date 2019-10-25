@@ -1,14 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, forwardRef } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import updateDescriptionMutation from "./updateEntryDescription.graphql";
 import styles from "./EntriesTable.module.css";
 
-function DescriptionCell({
-  cell: { value: initialValue },
-  row: {
-    original: { id: entryId }
-  }
-}) {
+function DescriptionCell(
+  {
+    cell: { value: initialValue },
+    row: {
+      original: { id: entryId }
+    },
+    focusNext
+  },
+  ref
+) {
   const [value, setValue] = useState(initialValue);
   const [updateDescription] = useMutation(updateDescriptionMutation);
 
@@ -20,18 +24,26 @@ function DescriptionCell({
     setValue(e.target.value);
   };
 
-  const handleBlur = () => {
+  const save = () =>
     updateDescription({ variables: { id: entryId, description: value } });
+
+  const handleSubmit = event => {
+    event.preventDefault();
+    save();
+    focusNext();
   };
 
   return (
-    <input
-      className={styles.descriptionCellInput}
-      value={value}
-      onChange={handleChange}
-      onBlur={handleBlur}
-    />
+    <form onSubmit={handleSubmit}>
+      <input
+        ref={ref}
+        className={styles.descriptionCellInput}
+        value={value}
+        onChange={handleChange}
+        onBlur={save}
+      />
+    </form>
   );
 }
 
-export default DescriptionCell;
+export default forwardRef(DescriptionCell);

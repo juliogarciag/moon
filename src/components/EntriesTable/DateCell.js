@@ -1,35 +1,49 @@
-import React, { useState, useEffect } from "react";
-import DatePicker from "react-datepicker";
+import React, { useState, useEffect, forwardRef } from "react";
 import { useMutation } from "@apollo/react-hooks";
-import "react-datepicker/dist/react-datepicker.css";
 import updateDateMutation from "./updateEntryDate.graphql";
 import styles from "./EntriesTable.module.css";
 
-function DateCell({
-  cell: { value: initialValue },
-  row: {
-    original: { id: entryId }
-  }
-}) {
-  const [date, setDate] = useState(() => new Date(initialValue));
+function DateCell(
+  {
+    cell: { value: initialValue },
+    row: {
+      original: { id: entryId }
+    },
+    focusNext
+  },
+  ref
+) {
+  const [date, setDate] = useState(initialValue);
   const [updateDate] = useMutation(updateDateMutation);
 
   useEffect(() => {
-    setDate(new Date(initialValue));
+    setDate(initialValue);
   }, [initialValue]);
 
-  const handleBlur = () => {
-    updateDate({ variables: { id: entryId, date: date.toISOString() } });
+  const save = () => updateDate({ variables: { id: entryId, date } });
+
+  const handleChange = event => {
+    setDate(event.target.value);
+  };
+
+  const handleSubmit = event => {
+    event.preventDefault();
+    save();
+    focusNext();
   };
 
   return (
-    <DatePicker
-      className={styles.dateCellInput}
-      selected={date}
-      onChange={setDate}
-      onBlur={handleBlur}
-    />
+    <form onSubmit={handleSubmit}>
+      <input
+        type="date"
+        ref={ref}
+        value={date}
+        onChange={handleChange}
+        onBlur={save}
+        className={styles.dateCellInput}
+      />
+    </form>
   );
 }
 
-export default DateCell;
+export default forwardRef(DateCell);

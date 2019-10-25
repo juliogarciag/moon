@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import { useTable, usePagination } from "react-table";
 import { sortBy } from "ramda";
 import classNames from "classnames";
@@ -31,22 +31,55 @@ function processEntries(entries) {
 }
 
 function EntriesTable({ entries }) {
+  const cellRefs = useRef(
+    useMemo(() => entries.map(() => [null, null, null]), [entries.length])
+  );
+
+  function withRef(component) {
+    return props => {
+      const { row, column } = props;
+
+      const attachRef = element => {
+        cellRefs.current[row.index] = cellRefs.current[row.index] || [];
+        cellRefs.current[row.index][column.index] = element;
+      };
+
+      const focusNext = () => {
+        const nextColumn = column.index + 1;
+        const nextCell = cellRefs.current[row.index][nextColumn];
+        if (nextCell) {
+          nextCell.focus();
+        }
+      };
+
+      return (
+        <div>
+          {React.createElement(component, {
+            ...props,
+            focusNext,
+            ref: attachRef
+          })}
+        </div>
+      );
+    };
+  }
+
   const columns = useMemo(
     () => [
       {
         Header: "Description",
         accessor: "description",
-        Cell: DescriptionCell
+        Cell: withRef(DescriptionCell)
       },
       {
         Header: "Date",
         accessor: "date",
-        Cell: DateCell
+        Cell: withRef(DateCell)
       },
       {
         Header: "Amount",
         accessor: "amountCents",
-        Cell: AmountCentsCell
+        Cell: withRef(AmountCentsCell)
       },
       {
         Header: "Total",

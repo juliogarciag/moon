@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, forwardRef } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import updateAmountCentsMutation from "./updateEntryAmountCents.graphql";
 import styles from "./EntriesTable.module.css";
 
-function AmountCentsCell({
-  cell: { value: initialValue },
-  row: {
-    original: { id: entryId }
-  }
-}) {
+function AmountCentsCell(
+  {
+    cell: { value: initialValue },
+    row: {
+      original: { id: entryId }
+    }
+  },
+  ref
+) {
   const [amountInDecimal, setAmountInDecimal] = useState(() =>
     (initialValue / 100).toFixed(2)
   );
@@ -30,6 +33,7 @@ function AmountCentsCell({
 
   return (
     <input
+      ref={ref}
       className={styles.amountCellInput}
       type="number"
       step="0.01"
@@ -40,4 +44,4 @@ function AmountCentsCell({
   );
 }
 
-export default AmountCentsCell;
+export default forwardRef(AmountCentsCell);

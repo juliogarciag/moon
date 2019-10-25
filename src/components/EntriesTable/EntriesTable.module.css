@@ -25,28 +25,31 @@
 
 .headerCell--date,
 .dataCell--date {
-  width: 17%;
+  width: 20%;
 }
 
 .headerCell--amountCents,
 .dataCell--amountCents {
-  width: 17%;
-}
-
-.headerCell--amountCents,
-.headerCell--totalCents,
-.headerCell--actions {
-  text-align: right;
+  width: 16%;
 }
 
 .headerCell--totalCents,
 .dataCell--totalCents {
-  width: 17%;
+  width: 16%;
 }
 
 .headerCell--actions,
 .dataCell--actions {
-  width: 17%;
+  width: 16%;
+}
+
+.headerCell--amountCents,
+.amountCellInput,
+.headerCell--totalCents,
+.dataCell--totalCents,
+.headerCell--actions,
+.dataCell--actions {
+  text-align: right;
 }
 
 .dataRow {
@@ -75,10 +78,4 @@
     border-right-color: black;
     background-color: #fbfec2;
   }
-}
-
-.amountCellInput,
-.dataCell--totalCents,
-.dataCell--actions {
-  text-align: right;
 }
