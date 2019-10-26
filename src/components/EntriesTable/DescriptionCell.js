@@ -29,7 +29,6 @@ function DescriptionCell(
 
   const handleSubmit = event => {
     event.preventDefault();
-    save();
     focusNext();
   };
 

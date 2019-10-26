@@ -26,23 +26,23 @@ function DateCell(
     setDate(event.target.value);
   };
 
-  const handleSubmit = event => {
-    event.preventDefault();
-    save();
-    focusNext();
+  const handleEnter = event => {
+    if (event.key === "Enter") {
+      save();
+      focusNext();
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="date"
-        ref={ref}
-        value={date}
-        onChange={handleChange}
-        onBlur={save}
-        className={styles.dateCellInput}
-      />
-    </form>
+    <input
+      type="date"
+      ref={ref}
+      value={date}
+      onChange={handleChange}
+      onKeyPress={handleEnter}
+      onBlur={save}
+      className={styles.dateCellInput}
+    />
   );
 }
 
