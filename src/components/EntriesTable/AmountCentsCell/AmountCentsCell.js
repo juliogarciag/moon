@@ -1,14 +1,15 @@
 import React, { useState, useEffect, forwardRef } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import updateAmountCentsMutation from "./updateEntryAmountCents.graphql";
-import styles from "./EntriesTable.module.css";
+import styles from "../EntriesTable.module.css";
 
 function AmountCentsCell(
   {
     cell: { value: initialValue },
     row: {
       original: { id: entryId }
-    }
+    },
+    focusNext
   },
   ref
 ) {
@@ -25,22 +26,29 @@ function AmountCentsCell(
     setAmountInDecimal(event.target.value.toString());
   };
 
-  const handleBlur = () => {
+  const handleSubmit = () => {
+    event.preventDefault();
+    focusNext();
+  };
+
+  const save = () => {
     updateAmountCents({
       variables: { id: entryId, amountCents: Number(amountInDecimal) * 100 }
     });
   };
 
   return (
-    <input
-      ref={ref}
-      className={styles.amountCellInput}
-      type="number"
-      step="0.01"
-      value={amountInDecimal}
-      onChange={handleChange}
-      onBlur={handleBlur}
-    />
+    <form onSubmit={handleSubmit}>
+      <input
+        ref={ref}
+        className={styles.amountCellInput}
+        type="number"
+        step="0.01"
+        value={amountInDecimal}
+        onChange={handleChange}
+        onBlur={save}
+      />
+    </form>
   );
 }
 

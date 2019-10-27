@@ -1,7 +1,7 @@
 import React, { useState, useEffect, forwardRef } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import updateDateMutation from "./updateEntryDate.graphql";
-import styles from "./EntriesTable.module.css";
+import styles from "../EntriesTable.module.css";
 
 function DateCell(
   {

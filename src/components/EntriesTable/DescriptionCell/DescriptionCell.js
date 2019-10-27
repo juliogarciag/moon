@@ -1,7 +1,7 @@
 import React, { useState, useEffect, forwardRef } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import updateDescriptionMutation from "./updateEntryDescription.graphql";
-import styles from "./EntriesTable.module.css";
+import styles from "../EntriesTable.module.css";
 
 function DescriptionCell(
   {

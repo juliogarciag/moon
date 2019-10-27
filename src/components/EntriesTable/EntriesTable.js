@@ -7,56 +7,20 @@ import React, {
 } from "react";
 import { useTable } from "react-table";
 import { FixedSizeList } from "react-window";
+import { times } from "ramda";
 import useWindowSize from "./useWindowSize";
-import { sortBy, memoizeWith, identity } from "ramda";
 import classNames from "classnames";
 import numbro from "numbro";
-import calculateMonths from "./calculateMonths";
 import DescriptionCell from "./DescriptionCell";
 import DateCell from "./DateCell";
 import AmountCentsCell from "./AmountCentsCell";
 import CreateEntryButton from "./CreateEntryButton";
 import DeleteEntryButton from "./DeleteEntryButton";
+import getLocalizedMonth from "./getLocalizedMonth";
 import styles from "./EntriesTable.module.css";
 
-const sortEntries = sortBy(entry => new Date(entry.date));
-
-const getLocalizedMonth = memoizeWith(identity, index => {
-  const objDate = new Date();
-  objDate.setDate(1);
-  objDate.setMonth(index);
-
-  const locale = "en-us",
-    month = objDate.toLocaleString(locale, { month: "long" });
-
-  return month;
-});
-
-function processEntries(entries) {
-  const sortedEntries = sortEntries(entries);
-  let total = 0;
-
-  const data = sortedEntries.map(entry => {
-    total = total + entry.amountCents;
-    const mappedEntry = {
-      id: entry.id,
-      description: entry.description,
-      date: entry.date,
-      amountCents: entry.amountCents,
-      totalCents: total
-    };
-    return mappedEntry;
-  });
-
-  const { years, months } = calculateMonths(sortedEntries);
-
-  return {
-    data,
-    years,
-    months
-  };
-}
-
+// NOTE: Bypass re-render of react-window's FixedSizedList component
+// re-rendering FixedSizedList component ends up in focus lose.
 const PrepareRowsContext = createContext();
 
 function Row({ index, style }) {
@@ -84,23 +48,26 @@ function Row({ index, style }) {
   );
 }
 
-function EntriesTable({ entries }) {
+function useTableRefs(rowsCount, columnsCount) {
   const cellRefs = useRef(
-    useMemo(() => entries.map(() => [null, null, null]), [entries.length])
+    useMemo(() => times(() => times(() => null, columnsCount), rowsCount))
   );
 
-  function withRef(component) {
+  function withCellRef(component) {
     return props => {
       const { row, column } = props;
 
-      const attachRef = element => {
+      const attachCellRef = element => {
         cellRefs.current[row.index] = cellRefs.current[row.index] || [];
         cellRefs.current[row.index][column.index] = element;
       };
 
       const focusNext = useCallback(() => {
-        const nextColumn = column.index + 1;
-        const nextCell = cellRefs.current[row.index][nextColumn];
+        const nextColumn =
+          column.index < columnsCount - 1 ? column.index + 1 : 0;
+        const nextRow = nextColumn === 0 ? row.index + 1 : row.index;
+        const nextCell = cellRefs.current[nextRow][nextColumn];
+
         if (nextCell) {
           nextCell.focus();
         }
@@ -111,29 +78,36 @@ function EntriesTable({ entries }) {
           {React.createElement(component, {
             ...props,
             focusNext,
-            ref: attachRef
+            ref: attachCellRef
           })}
         </div>
       );
     };
   }
 
+  return withCellRef;
+}
+
+function EntriesTable({ entries, years, months }) {
+  const columnsCount = 3;
+  const withCellRef = useTableRefs(entries.length, columnsCount);
+
   const columns = useMemo(
     () => [
       {
         Header: "Description",
         accessor: "description",
-        Cell: withRef(DescriptionCell)
+        Cell: withCellRef(DescriptionCell)
       },
       {
         Header: "Date",
         accessor: "date",
-        Cell: withRef(DateCell)
+        Cell: withCellRef(DateCell)
       },
       {
         Header: "Amount",
         accessor: "amountCents",
-        Cell: withRef(AmountCentsCell)
+        Cell: withCellRef(AmountCentsCell)
       },
       {
         Header: "Total",
@@ -159,10 +133,6 @@ function EntriesTable({ entries }) {
     []
   );
 
-  const { data, years, months } = useMemo(() => processEntries(entries), [
-    entries
-  ]);
-
   const {
     rows,
     getTableProps,
@@ -171,7 +141,7 @@ function EntriesTable({ entries }) {
     prepareRow
   } = useTable({
     columns,
-    data
+    data: entries
   });
 
   const windowSize = useWindowSize();
@@ -183,7 +153,7 @@ function EntriesTable({ entries }) {
   const fixedListRef = useRef(null);
 
   const navigateToEntryId = entryId => {
-    const dataIndex = data.findIndex(entry => entry.id === entryId);
+    const dataIndex = entries.findIndex(entry => entry.id === entryId);
     fixedListRef.current.scrollToItem(dataIndex);
   };
 
@@ -223,6 +193,17 @@ function EntriesTable({ entries }) {
           </div>
         </div>
         <ul className={styles.dateLinks}>
+          <li>
+            <button
+              onClick={() => {
+                if (entries.length > 0) {
+                  navigateToEntryId(entries[entries.length - 1].id);
+                }
+              }}
+            >
+              Most Recent
+            </button>
+          </li>
           {years.map(year => (
             <li key={year}>
               <div>{year}</div>
