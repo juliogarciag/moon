@@ -1,14 +1,26 @@
-import { sortBy } from "ramda";
+import { sortBy, prop } from "ramda";
 import calculateMonths from "./calculateMonths";
 
-const sortEntries = sortBy(entry => new Date(entry.date));
+const sortEntries = sortBy(prop("dateAsDate"));
+const addParsedDateToEntry = entry => ({
+  ...entry,
+  dateAsDate: new Date(entry.date)
+});
 
 function processEntries(rawEntries) {
-  const sortedEntries = sortEntries(rawEntries);
+  const entriesWithDates = rawEntries.map(addParsedDateToEntry);
+  const sortedEntries = sortEntries(entriesWithDates);
+
+  const today = new Date();
   let total = 0;
+  let todayTotal = 0;
 
   const entries = sortedEntries.map(entry => {
-    total = total + entry.amountCents;
+    total += entry.amountCents;
+    if (entry.dateAsDate <= today) {
+      todayTotal += entry.amountCents;
+    }
+
     return {
       id: entry.id,
       description: entry.description,
@@ -20,7 +32,7 @@ function processEntries(rawEntries) {
 
   const { years, months } = calculateMonths(sortedEntries);
 
-  return { entries, years, months };
+  return { entries, years, months, todayTotal };
 }
 
 export default processEntries;

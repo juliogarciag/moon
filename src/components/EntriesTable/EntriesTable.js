@@ -96,7 +96,7 @@ function useTableRefs(rowsCount, columnsCount) {
   return withCellRef;
 }
 
-function EntriesTable({ entries, years, months }) {
+function EntriesTable({ entries, years, months, todayTotal }) {
   const columnsCount = 3;
   const withCellRef = useTableRefs(entries.length, columnsCount);
 
@@ -198,6 +198,14 @@ function EntriesTable({ entries, years, months }) {
           </div>
         </div>
         <ul>
+          <li>
+            Total:{" "}
+            {numbro(todayTotal / 100).formatCurrency({
+              average: false,
+              thousandSeparated: true,
+              mantissa: 2
+            })}
+          </li>
           <li>
             <button
               onClick={() => {

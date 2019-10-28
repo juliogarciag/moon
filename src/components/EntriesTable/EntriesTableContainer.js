@@ -15,9 +15,16 @@ function EntriesTableContainer() {
     return <p>Error.</p>;
   }
 
-  const { entries, years, months } = processEntries(data.entries);
+  const { entries, years, months, todayTotal } = processEntries(data.entries);
 
-  return <EntriesTable entries={entries} years={years} months={months} />;
+  return (
+    <EntriesTable
+      entries={entries}
+      years={years}
+      months={months}
+      todayTotal={todayTotal}
+    />
+  );
 }
 
 export default EntriesTableContainer;
