@@ -1,6 +1,8 @@
+const path = require("path");
+
 module.exports = {
   plugins: [
-    require("postcss-import"),
+    require("postcss-import")({ path: [path.resolve("src")] }),
     require("postcss-flexbugs-fixes"),
     require("postcss-preset-env")({
       autoprefixer: {
@@ -8,6 +10,7 @@ module.exports = {
       },
       stage: 3
     }),
-    require("postcss-nested")
+    require("postcss-nested"),
+    require("tailwindcss")
   ]
 };

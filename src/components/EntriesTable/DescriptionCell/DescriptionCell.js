@@ -1,7 +1,7 @@
 import React, { useState, useEffect, forwardRef } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import updateDescriptionMutation from "./updateEntryDescription.graphql";
-import styles from "../EntriesTable.module.css";
+import Input from "components/Input";
 
 function DescriptionCell(
   {
@@ -34,13 +34,7 @@ function DescriptionCell(
 
   return (
     <form onSubmit={handleSubmit}>
-      <input
-        ref={ref}
-        className={styles.descriptionCellInput}
-        value={value}
-        onChange={handleChange}
-        onBlur={save}
-      />
+      <Input ref={ref} value={value} onChange={handleChange} onBlur={save} />
     </form>
   );
 }

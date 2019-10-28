@@ -3,7 +3,8 @@ import React, {
   useRef,
   createContext,
   useContext,
-  useCallback
+  useCallback,
+  createElement
 } from "react";
 import { useTable } from "react-table";
 import { FixedSizeList } from "react-window";
@@ -17,11 +18,18 @@ import AmountCentsCell from "./AmountCentsCell";
 import CreateEntryButton from "./CreateEntryButton";
 import DeleteEntryButton from "./DeleteEntryButton";
 import getLocalizedMonth from "./getLocalizedMonth";
-import styles from "./EntriesTable.module.css";
 
 // NOTE: Bypass re-render of react-window's FixedSizedList component
 // re-rendering FixedSizedList component ends up in focus lose.
 const PrepareRowsContext = createContext();
+
+const COLUMN_STYLES = {
+  description: "w-4/12",
+  date: "w-2/12",
+  amountCents: "w-2/12 text-right",
+  totalCents: "w-2/12 text-right",
+  actions: "w-2/12 text-right"
+};
 
 function Row({ index, style }) {
   const { rows, prepareRow } = useContext(PrepareRowsContext);
@@ -29,15 +37,15 @@ function Row({ index, style }) {
 
   return (
     prepareRow(row) || (
-      <div {...row.getRowProps({ style })} className={styles.dataRow}>
+      <div
+        {...row.getRowProps({ style })}
+        className="flex items-center border-b border-solid border-gray-600 overflow-hidden"
+      >
         {row.cells.map(cell => {
           return (
             <div
               {...cell.getCellProps()}
-              className={classNames(
-                styles.dataCell,
-                styles[`dataCell--${cell.column.id}`]
-              )}
+              className={COLUMN_STYLES[cell.column.id]}
             >
               {cell.render("Cell")}
             </div>
@@ -75,7 +83,7 @@ function useTableRefs(rowsCount, columnsCount) {
 
       return (
         <div>
-          {React.createElement(component, {
+          {createElement(component, {
             ...props,
             focusNext,
             ref: attachCellRef
@@ -159,20 +167,17 @@ function EntriesTable({ entries, years, months }) {
 
   return (
     <PrepareRowsContext.Provider value={{ rows, prepareRow }}>
-      <div className={styles.wrapper}>
-        <div {...getTableProps()} className={styles.table}>
-          <div className={styles.header}>
+      <div className="flex">
+        <div {...getTableProps()} className="text-sm font-mono w-1/2">
+          <div className="border-b border-solid border-black">
             {headerGroups.map(headerGroup => (
-              <div
-                {...headerGroup.getHeaderGroupProps()}
-                className={styles.headerRow}
-              >
+              <div {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map(column => (
                   <div
                     {...column.getHeaderProps()}
                     className={classNames(
-                      styles.headerCell,
-                      styles[`headerCell--${column.id}`]
+                      "inline-block font-bold p-2",
+                      COLUMN_STYLES[column.id]
                     )}
                   >
                     {column.render("Header")}
@@ -181,7 +186,7 @@ function EntriesTable({ entries, years, months }) {
               </div>
             ))}
           </div>
-          <div {...getTableBodyProps()} className={styles.data}>
+          <div {...getTableBodyProps()}>
             <FixedSizeList
               height={tableHeight}
               itemCount={rows.length}
@@ -192,7 +197,7 @@ function EntriesTable({ entries, years, months }) {
             </FixedSizeList>
           </div>
         </div>
-        <ul className={styles.dateLinks}>
+        <ul>
           <li>
             <button
               onClick={() => {

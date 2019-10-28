@@ -1,7 +1,7 @@
 import React, { useState, useEffect, forwardRef } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import updateAmountCentsMutation from "./updateEntryAmountCents.graphql";
-import styles from "../EntriesTable.module.css";
+import Input from "components/Input";
 
 function AmountCentsCell(
   {
@@ -39,11 +39,11 @@ function AmountCentsCell(
 
   return (
     <form onSubmit={handleSubmit}>
-      <input
+      <Input
         ref={ref}
-        className={styles.amountCellInput}
         type="number"
         step="0.01"
+        className="text-right"
         value={amountInDecimal}
         onChange={handleChange}
         onBlur={save}

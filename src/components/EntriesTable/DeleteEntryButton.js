@@ -25,7 +25,14 @@ function DeleteEntryButton({ row: { original } }) {
     deleteEntry({ variables: { id: original.id } });
   };
 
-  return <button onClick={handleDelete}>Delete</button>;
+  return (
+    <button
+      className="font-bold text-white text-xs bg-red-500 p-2 focus:outline-none"
+      onClick={handleDelete}
+    >
+      Delete
+    </button>
+  );
 }
 
 export default DeleteEntryButton;

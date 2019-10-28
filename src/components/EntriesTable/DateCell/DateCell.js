@@ -1,7 +1,7 @@
 import React, { useState, useEffect, forwardRef } from "react";
 import { useMutation } from "@apollo/react-hooks";
+import Input from "components/Input";
 import updateDateMutation from "./updateEntryDate.graphql";
-import styles from "../EntriesTable.module.css";
 
 function DateCell(
   {
@@ -34,14 +34,13 @@ function DateCell(
   };
 
   return (
-    <input
+    <Input
       type="date"
       ref={ref}
       value={date}
       onChange={handleChange}
       onKeyPress={handleEnter}
       onBlur={save}
-      className={styles.dateCellInput}
     />
   );
 }

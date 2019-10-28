@@ -9,8 +9,8 @@ function renderApp(AppComponent) {
 }
 
 if (module.hot) {
-  module.hot.accept("components/App.js", () => {
-    const HotLoadedApp = require("components/App.js").default;
+  module.hot.accept("components/App/index.js", () => {
+    const HotLoadedApp = require("components/App/index.js").default;
     renderApp(HotLoadedApp);
   });
 }

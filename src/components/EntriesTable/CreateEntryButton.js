@@ -29,7 +29,14 @@ function CreateEntryButton({ row: { original } }) {
     });
   };
 
-  return <button onClick={handleCreate}>Add Entry</button>;
+  return (
+    <button
+      className="font-bold text-white text-xs bg-blue-500 p-2 focus:outline-none"
+      onClick={handleCreate}
+    >
+      Add Entry
+    </button>
+  );
 }
 
 export default CreateEntryButton;

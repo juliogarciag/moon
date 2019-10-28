@@ -1,6 +1,7 @@
 import React from "react";
 import { ApolloProvider } from "@apollo/react-hooks";
 import ApolloClient from "apollo-boost";
+import "./App.css";
 import EntriesTable from "components/EntriesTable";
 
 const client = new ApolloClient({
