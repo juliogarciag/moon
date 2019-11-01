@@ -5,7 +5,7 @@ module Types
     end
 
     def entries
-      Entry.all
+      Entry.kept
     end
   end
 end

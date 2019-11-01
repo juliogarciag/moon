@@ -6,7 +6,7 @@ module Mutations
 
     def resolve(id:)
       entry = Entry.find(id)
-      { deleted: entry.destroy }
+      { deleted: entry.discard }
     end
   end
 end
