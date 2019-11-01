@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import { useTable } from "react-table";
 import { FixedSizeList } from "react-window";
-import { times } from "ramda";
+import { times, sortBy, prop } from "ramda";
 import useWindowSize from "./useWindowSize";
 import classNames from "classnames";
 import numbro from "numbro";
@@ -18,6 +18,7 @@ import AmountCentsCell from "./AmountCentsCell";
 import CreateEntryButton from "./CreateEntryButton";
 import DeleteEntryButton from "./DeleteEntryButton";
 import getLocalizedMonth from "./getLocalizedMonth";
+import { Link } from "react-feather";
 
 // NOTE: Bypass re-render of react-window's FixedSizedList component
 // re-rendering FixedSizedList component ends up in focus lose.
@@ -39,7 +40,7 @@ function Row({ index, style }) {
     prepareRow(row) || (
       <div
         {...row.getRowProps({ style })}
-        className="flex items-center border-b border-solid border-gray-600 overflow-hidden"
+        className="flex items-center border-b border-r border-solid border-gray-600"
       >
         {row.cells.map(cell => {
           return (
@@ -120,21 +121,24 @@ function EntriesTable({ entries, years, months, todayTotal }) {
       {
         Header: "Total",
         accessor: "totalCents",
-        Cell: ({ cell: { value } }) =>
-          numbro(value / 100).formatCurrency({
-            average: false,
-            thousandSeparated: true,
-            mantissa: 2
-          })
+        Cell: ({ cell: { value } }) => (
+          <span className="font-mono">
+            {numbro(value / 100).formatCurrency({
+              average: false,
+              thousandSeparated: true,
+              mantissa: 2
+            })}
+          </span>
+        )
       },
       {
         Header: "Actions",
         id: "actions",
         Cell: props => (
-          <>
+          <div className="flex justify-end">
             <CreateEntryButton {...props} />
             <DeleteEntryButton {...props} />
-          </>
+          </div>
         )
       }
     ],
@@ -160,23 +164,33 @@ function EntriesTable({ entries, years, months, todayTotal }) {
 
   const fixedListRef = useRef(null);
 
-  const navigateToEntryId = entryId => {
+  const goToEntryId = entryId => {
     const dataIndex = entries.findIndex(entry => entry.id === entryId);
     fixedListRef.current.scrollToItem(dataIndex);
+  };
+
+  const goToMostRecentEntry = () => {
+    const mostRecentEntry = sortBy(prop("todayCloseness"), entries)[0];
+    if (mostRecentEntry) {
+      goToEntryId(mostRecentEntry.id);
+    }
   };
 
   return (
     <PrepareRowsContext.Provider value={{ rows, prepareRow }}>
       <div className="flex">
-        <div {...getTableProps()} className="text-sm font-mono w-1/2">
+        <div {...getTableProps()} className="text-sm w-1/2">
           <div className="border-b border-solid border-black">
             {headerGroups.map(headerGroup => (
               <div {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map(column => (
+                {headerGroup.headers.map((column, index) => (
                   <div
                     {...column.getHeaderProps()}
                     className={classNames(
                       "inline-block font-bold p-2",
+                      index === headerGroup.headers.length - 1
+                        ? "border-r border-solid border-black"
+                        : "",
                       COLUMN_STYLES[column.id]
                     )}
                   >
@@ -190,50 +204,55 @@ function EntriesTable({ entries, years, months, todayTotal }) {
             <FixedSizeList
               height={tableHeight}
               itemCount={rows.length}
-              itemSize={35}
+              itemSize={38}
               ref={fixedListRef}
             >
               {Row}
             </FixedSizeList>
           </div>
         </div>
-        <ul>
-          <li>
-            Total:{" "}
-            {numbro(todayTotal / 100).formatCurrency({
-              average: false,
-              thousandSeparated: true,
-              mantissa: 2
-            })}
-          </li>
-          <li>
-            <button
-              onClick={() => {
-                if (entries.length > 0) {
-                  navigateToEntryId(entries[entries.length - 1].id);
-                }
-              }}
-            >
+
+        <div className="py-2 h-screen overflow-auto text-sm">
+          <div className="pb-2 px-4 border-b border-black border-solid mb-2">
+            <span className="font-bold">Total: </span>
+            <span className="font-mono leading-none">
+              {numbro(todayTotal / 100).formatCurrency({
+                average: false,
+                thousandSeparated: true,
+                mantissa: 2,
+                currencySymbol: "$ "
+              })}
+            </span>
+          </div>
+          <div className="px-4 pb-2 border-b border-black">
+            <button onClick={goToMostRecentEntry} className="hover:underline">
+              <Link size={12} className="inline mr-2" />
               Most Recent
             </button>
-          </li>
-          {years.map(year => (
-            <li key={year}>
-              <div>{year}</div>
-              <ul>
-                {months[year].map(({ month, firstEntryId }) => {
-                  return (
-                    <li key={month}>
-                      <button onClick={() => navigateToEntryId(firstEntryId)}>
-                        {getLocalizedMonth(month)}
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </li>
-          ))}
-        </ul>
+          </div>
+          <ul>
+            {years.map(year => (
+              <li key={year}>
+                <div className="px-4 pt-2 font-bold">{year}</div>
+                <ul className="pl-4 py-2 border-b border-black">
+                  {months[year].map(({ month, firstEntryId }) => {
+                    return (
+                      <li key={month}>
+                        <button
+                          className="hover:underline"
+                          onClick={() => goToEntryId(firstEntryId)}
+                        >
+                          <Link size={12} className="inline mr-2" />
+                          {getLocalizedMonth(month)}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </PrepareRowsContext.Provider>
   );

@@ -36,6 +36,7 @@ function DateCell(
   return (
     <Input
       type="date"
+      className="leading-none"
       ref={ref}
       value={date}
       onChange={handleChange}

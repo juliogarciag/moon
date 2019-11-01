@@ -1,5 +1,6 @@
 import React from "react";
 import { useMutation } from "@apollo/react-hooks";
+import { PlusSquare } from "react-feather";
 import getEntriesQuery from "./getEntries.graphql";
 import createEntryMutation from "./createEntry.graphql";
 
@@ -30,11 +31,8 @@ function CreateEntryButton({ row: { original } }) {
   };
 
   return (
-    <button
-      className="font-bold text-white text-xs bg-blue-500 p-2 focus:outline-none"
-      onClick={handleCreate}
-    >
-      Add Entry
+    <button onClick={handleCreate} className="mr-2">
+      <PlusSquare size={18} />
     </button>
   );
 }

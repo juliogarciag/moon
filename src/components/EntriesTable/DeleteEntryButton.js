@@ -1,5 +1,6 @@
 import React from "react";
 import { useMutation } from "@apollo/react-hooks";
+import { Trash2 } from "react-feather";
 import getEntriesQuery from "./getEntries.graphql";
 import deleteEntryMutation from "./deleteEntry.graphql";
 
@@ -26,11 +27,8 @@ function DeleteEntryButton({ row: { original } }) {
   };
 
   return (
-    <button
-      className="font-bold text-white text-xs bg-red-500 p-2 focus:outline-none"
-      onClick={handleDelete}
-    >
-      Delete
+    <button onClick={handleDelete} className="mr-1">
+      <Trash2 size={18} />
     </button>
   );
 }

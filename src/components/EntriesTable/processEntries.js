@@ -1,4 +1,5 @@
 import { sortBy, prop } from "ramda";
+import { differenceInDays } from "date-fns";
 import calculateMonths from "./calculateMonths";
 
 const sortEntries = sortBy(prop("dateAsDate"));
@@ -26,7 +27,8 @@ function processEntries(rawEntries) {
       description: entry.description,
       date: entry.date,
       amountCents: entry.amountCents,
-      totalCents: total
+      totalCents: total,
+      todayCloseness: Math.abs(differenceInDays(entry.dateAsDate, today))
     };
   });
 

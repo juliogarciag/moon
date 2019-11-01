@@ -43,7 +43,7 @@ function AmountCentsCell(
         ref={ref}
         type="number"
         step="0.01"
-        className="text-right"
+        className="text-right font-mono"
         value={amountInDecimal}
         onChange={handleChange}
         onBlur={save}
