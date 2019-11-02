@@ -4,5 +4,6 @@
     description
     date
     amountCents
+    isNew
   }
 }

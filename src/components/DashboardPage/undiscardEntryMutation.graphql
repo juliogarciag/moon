@@ -6,6 +6,7 @@ mutation UndiscardEntry($id: ID!) {
       description
       amountCents
       date
+      isNew
     }
   }
 }

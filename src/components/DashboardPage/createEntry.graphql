@@ -13,6 +13,7 @@ mutation CreateEntry(
       description
       amountCents
       date
+      isNew
     }
   }
 }

@@ -5,6 +5,7 @@ mutation UpdateEntryDate($id: ID!, $date: ISO8601Date!) {
       description
       amountCents
       date
+      isNew
     }
   }
 }

@@ -5,6 +5,7 @@ mutation UpdateEntryAmountCents($id: ID!, $amountCents: Int!) {
       description
       amountCents
       date
+      isNew
     }
   }
 }

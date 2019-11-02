@@ -4,5 +4,6 @@ module Types
     field :discard_entry, mutation: Mutations::DiscardEntry
     field :update_entry, mutation: Mutations::UpdateEntry
     field :undiscard_entry, mutation: Mutations::UndiscardEntry
+    field :delete_entry, mutation: Mutations::DeleteEntry
   end
 end

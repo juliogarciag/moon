@@ -49,6 +49,7 @@ function processEntries(rawEntries) {
       description: entry.description,
       date: entry.date,
       amountCents: entry.amountCents,
+      isNew: entry.isNew,
       totalCents: total,
       todayCloseness: Math.abs(differenceInDays(entry.dateAsDate, today)),
       ...getEntryDatePredicates(sortedEntries, entry, index)

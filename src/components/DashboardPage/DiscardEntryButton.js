@@ -1,11 +1,12 @@
 import React from "react";
 import { useMutation } from "@apollo/react-hooks";
-import { Trash2 } from "react-feather";
+import { Trash2, XSquare } from "react-feather";
 import getEntriesQuery from "./getEntries.graphql";
 import getDiscardedEntriesQuery from "./getDiscardedEntriesQuery.graphql";
 import discardEntryMutation from "./discardEntry.graphql";
+import deleteEntryMutation from "./deleteEntry.graphql";
 
-function updateCache(cache, entry) {
+function updateCacheAfterDiscard(cache, entry) {
   const { entries } = cache.readQuery({ query: getEntriesQuery });
   const { discardedEntries } = cache.readQuery({
     query: getDiscardedEntriesQuery
@@ -23,23 +24,44 @@ function updateCache(cache, entry) {
   });
 }
 
+function updateCacheAfterDelete(cache, entry) {
+  const { entries } = cache.readQuery({ query: getEntriesQuery });
+  cache.writeQuery({
+    query: getEntriesQuery,
+    data: { entries: entries.filter(e => e.id !== entry.id) }
+  });
+}
+
 function DiscardEntryButton({ row: { original } }) {
   const [discardEntry] = useMutation(discardEntryMutation, {
     update(cache, { data }) {
       const { discardEntry } = data;
       if (discardEntry.discarded) {
-        updateCache(cache, discardEntry.entry);
+        updateCacheAfterDiscard(cache, discardEntry.entry);
+      }
+    }
+  });
+
+  const [deleteEntry] = useMutation(deleteEntryMutation, {
+    update(cache, { data }) {
+      const { deleteEntry } = data;
+      if (deleteEntry.deleted) {
+        updateCacheAfterDelete(cache, deleteEntry.entry);
       }
     }
   });
 
   const handleClick = () => {
-    discardEntry({ variables: { id: original.id } });
+    if (original.isNew) {
+      deleteEntry({ variables: { id: original.id } });
+    } else {
+      discardEntry({ variables: { id: original.id } });
+    }
   };
 
   return (
     <button onClick={handleClick} className="mr-1">
-      <Trash2 size={18} />
+      {original.isNew ? <XSquare size={18} /> : <Trash2 size={18} />}
     </button>
   );
 }

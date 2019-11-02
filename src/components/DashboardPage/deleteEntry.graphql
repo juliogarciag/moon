@@ -1,6 +1,6 @@
-mutation DiscardEntry($id: ID!) {
-  discardEntry(id: $id) {
-    discarded
+mutation DeleteEntry($id: ID!) {
+  deleteEntry(id: $id) {
+    deleted
     entry {
       id
       description
