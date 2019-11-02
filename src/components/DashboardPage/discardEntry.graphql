@@ -1,0 +1,11 @@
+mutation DiscardEntry($id: ID!) {
+  discardEntry(id: $id) {
+    discarded
+    entry {
+      id
+      description
+      amountCents
+      date
+    }
+  }
+}

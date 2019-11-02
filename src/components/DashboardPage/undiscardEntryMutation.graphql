@@ -1,0 +1,11 @@
+mutation UndiscardEntry($id: ID!) {
+  undiscardEntry(id: $id) {
+    undiscarded
+    entry {
+      id
+      description
+      amountCents
+      date
+    }
+  }
+}

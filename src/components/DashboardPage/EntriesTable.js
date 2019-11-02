@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import { useTable } from "react-table";
 import { FixedSizeList } from "react-window";
-import { times, sortBy, prop } from "ramda";
+import { times } from "ramda";
 import useWindowSize from "./useWindowSize";
 import classNames from "classnames";
 import numbro from "numbro";
@@ -16,9 +16,7 @@ import DescriptionCell from "./DescriptionCell";
 import DateCell from "./DateCell";
 import AmountCentsCell from "./AmountCentsCell";
 import CreateEntryButton from "./CreateEntryButton";
-import DeleteEntryButton from "./DeleteEntryButton";
-import getLocalizedMonth from "./getLocalizedMonth";
-import { Link } from "react-feather";
+import DiscardEntryButton from "./DiscardEntryButton";
 
 // NOTE: Bypass re-render of react-window's FixedSizedList component
 // re-rendering FixedSizedList component ends up in focus lose.
@@ -97,7 +95,7 @@ function useTableRefs(rowsCount, columnsCount) {
   return withCellRef;
 }
 
-function EntriesTable({ entries, years, months, todayTotal }) {
+function EntriesTable({ entries, tableWindowRef }) {
   const columnsCount = 3;
   const withCellRef = useTableRefs(entries.length, columnsCount);
 
@@ -137,7 +135,7 @@ function EntriesTable({ entries, years, months, todayTotal }) {
         Cell: props => (
           <div className="flex justify-end">
             <CreateEntryButton {...props} />
-            <DeleteEntryButton {...props} />
+            <DiscardEntryButton {...props} />
           </div>
         )
       }
@@ -162,96 +160,38 @@ function EntriesTable({ entries, years, months, todayTotal }) {
     return windowSize.innerHeight - headerHeight;
   }, [windowSize]);
 
-  const fixedListRef = useRef(null);
-
-  const goToEntryId = entryId => {
-    const dataIndex = entries.findIndex(entry => entry.id === entryId);
-    fixedListRef.current.scrollToItem(dataIndex);
-  };
-
-  const goToMostRecentEntry = () => {
-    const mostRecentEntry = sortBy(prop("todayCloseness"), entries)[0];
-    if (mostRecentEntry) {
-      goToEntryId(mostRecentEntry.id);
-    }
-  };
-
   return (
     <PrepareRowsContext.Provider value={{ rows, prepareRow }}>
-      <div className="flex">
-        <div {...getTableProps()} className="text-sm w-1/2">
-          <div className="border-b border-solid border-black">
-            {headerGroups.map(headerGroup => (
-              <div {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column, index) => (
-                  <div
-                    {...column.getHeaderProps()}
-                    className={classNames(
-                      "inline-block font-bold p-2",
-                      index === headerGroup.headers.length - 1
-                        ? "border-r border-solid border-black"
-                        : "",
-                      COLUMN_STYLES[column.id]
-                    )}
-                  >
-                    {column.render("Header")}
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-          <div {...getTableBodyProps()}>
-            <FixedSizeList
-              height={tableHeight}
-              itemCount={rows.length}
-              itemSize={38}
-              ref={fixedListRef}
-            >
-              {Row}
-            </FixedSizeList>
-          </div>
+      <div {...getTableProps()} className="text-sm w-1/2">
+        <div className="border-b border-solid border-black">
+          {headerGroups.map(headerGroup => (
+            <div {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map((column, index) => (
+                <div
+                  {...column.getHeaderProps()}
+                  className={classNames(
+                    "inline-block font-bold p-2",
+                    index === headerGroup.headers.length - 1
+                      ? "border-r border-solid border-black"
+                      : "",
+                    COLUMN_STYLES[column.id]
+                  )}
+                >
+                  {column.render("Header")}
+                </div>
+              ))}
+            </div>
+          ))}
         </div>
-
-        <div className="py-2 h-screen overflow-auto text-sm">
-          <div className="pb-2 px-4 border-b border-black border-solid mb-2">
-            <span className="font-bold">Total: </span>
-            <span className="font-mono leading-none">
-              {numbro(todayTotal / 100).formatCurrency({
-                average: false,
-                thousandSeparated: true,
-                mantissa: 2,
-                currencySymbol: "$ "
-              })}
-            </span>
-          </div>
-          <div className="px-4 pb-2 border-b border-black">
-            <button onClick={goToMostRecentEntry} className="hover:underline">
-              <Link size={12} className="inline mr-2" />
-              Most Recent
-            </button>
-          </div>
-          <ul>
-            {years.map(year => (
-              <li key={year}>
-                <div className="px-4 pt-2 font-bold">{year}</div>
-                <ul className="pl-4 py-2 border-b border-black">
-                  {months[year].map(({ month, firstEntryId }) => {
-                    return (
-                      <li key={month}>
-                        <button
-                          className="hover:underline"
-                          onClick={() => goToEntryId(firstEntryId)}
-                        >
-                          <Link size={12} className="inline mr-2" />
-                          {getLocalizedMonth(month)}
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </li>
-            ))}
-          </ul>
+        <div {...getTableBodyProps()}>
+          <FixedSizeList
+            height={tableHeight}
+            itemCount={rows.length}
+            itemSize={38}
+            ref={tableWindowRef}
+          >
+            {Row}
+          </FixedSizeList>
         </div>
       </div>
     </PrepareRowsContext.Provider>

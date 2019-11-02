@@ -1,0 +1,8 @@
+{
+  discardedEntries {
+    id
+    description
+    date
+    amountCents
+  }
+}
