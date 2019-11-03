@@ -73,9 +73,12 @@ function useTableRefs(entries, columnsCount) {
     return props => {
       const { row, column } = props;
 
-      const attachCellRef = element => {
-        cellRefs.current[row.original.id][column.index] = element;
-      };
+      const attachCellRef = useCallback(
+        element => {
+          cellRefs.current[row.original.id][column.index] = element;
+        },
+        [cellRefs.current]
+      );
 
       const focusNext = useCallback(() => {
         const nextColumn =
