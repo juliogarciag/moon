@@ -5,5 +5,6 @@ module Types
     field :amount_cents, Integer, null: false
     field :date, GraphQL::Types::ISO8601Date, null: false
     field :is_new, Boolean, null: false
+    field :created_at, GraphQL::Types::ISO8601Date, null: false
   end
 end

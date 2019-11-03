@@ -1,12 +1,10 @@
+#import "components/DashboardPage/EntryFieldsFragment.graphql"
+
 mutation DeleteEntry($id: ID!) {
   deleteEntry(id: $id) {
     deleted
     entry {
-      id
-      description
-      amountCents
-      date
-      isNew
+      ...EntryFields
     }
   }
 }

@@ -1,11 +1,9 @@
+#import "components/DashboardPage/EntryFieldsFragment.graphql"
+
 mutation UpdateEntryAmountCents($id: ID!, $amountCents: Int!) {
   updateEntry(id: $id, amountCents: $amountCents) {
     entry {
-      id
-      description
-      amountCents
-      date
-      isNew
+      ...EntryFields
     }
   }
 }

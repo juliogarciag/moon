@@ -1,3 +1,5 @@
+#import "components/DashboardPage/EntryFieldsFragment.graphql"
+
 mutation CreateEntry(
   $description: String!
   $amountCents: Int!
@@ -9,11 +11,7 @@ mutation CreateEntry(
     date: $date
   ) {
     entry {
-      id
-      description
-      amountCents
-      date
-      isNew
+      ...EntryFields
     }
   }
 }

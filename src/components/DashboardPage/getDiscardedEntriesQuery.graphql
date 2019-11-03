@@ -1,9 +1,7 @@
+#import "components/DashboardPage/EntryFieldsFragment.graphql"
+
 {
   discardedEntries {
-    id
-    description
-    date
-    amountCents
-    isNew
+    ...EntryFields
   }
 }

@@ -1,0 +1,8 @@
+fragment EntryFields on Entry {
+  id
+  description
+  date
+  amountCents
+  isNew
+  createdAt
+}

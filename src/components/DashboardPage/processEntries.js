@@ -1,8 +1,11 @@
-import { sortBy, prop } from "ramda";
+import { sortWith, prop, ascend, descend } from "ramda";
 import { differenceInDays } from "date-fns";
 import calculateMonths from "./calculateMonths";
 
-const sortEntries = sortBy(prop("dateAsDate"));
+const sortEntries = sortWith([
+  ascend(prop("dateAsDate")),
+  ascend(prop("createdAt"))
+]);
 const addDateAsDateProperty = entry => ({
   ...entry,
   dateAsDate: new Date(entry.date)

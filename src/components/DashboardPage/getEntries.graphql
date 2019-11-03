@@ -1,9 +1,7 @@
+#import "components/DashboardPage/EntryFieldsFragment.graphql"
+
 {
   entries {
-    id
-    description
-    date
-    amountCents
-    isNew
+    ...EntryFields
   }
 }
