@@ -60,7 +60,11 @@ function DiscardEntryButton({ row: { original } }) {
   };
 
   return (
-    <button onClick={handleClick} className="mr-1">
+    <button
+      onClick={handleClick}
+      className="mr-1"
+      title={original.isNew ? "Delete Entry" : "Discard Entry"}
+    >
       {original.isNew ? <XSquare size={18} /> : <Trash2 size={18} />}
     </button>
   );

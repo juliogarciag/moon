@@ -31,7 +31,7 @@ function CreateEntryButton({ row: { original } }) {
   };
 
   return (
-    <button onClick={handleCreate} className="mr-2">
+    <button onClick={handleCreate} className="mr-2" title="Create Entry">
       <PlusSquare size={18} />
     </button>
   );

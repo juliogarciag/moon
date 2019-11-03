@@ -156,7 +156,7 @@ function EntriesTable({ entries, tableWindowRef }) {
 
   const windowSize = useWindowSize();
   const tableHeight = useMemo(() => {
-    const headerHeight = 49;
+    const headerHeight = 38;
     return windowSize.innerHeight - headerHeight;
   }, [windowSize]);
 

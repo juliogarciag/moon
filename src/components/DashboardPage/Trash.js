@@ -1,9 +1,12 @@
 import React from "react";
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import numbro from "numbro";
+import { Trash2 } from "react-feather";
+import classNames from "classnames";
 import getEntriesQuery from "./getEntries.graphql";
 import getDiscardedEntriesQuery from "./getDiscardedEntriesQuery.graphql";
 import undiscardEntryMutation from "./undiscardEntryMutation.graphql";
+import { format } from "date-fns/esm";
 
 function updateCache(cache, entry) {
   const { discardedEntries } = cache.readQuery({
@@ -24,6 +27,10 @@ function updateCache(cache, entry) {
       entries: entries.concat([entry])
     }
   });
+}
+
+function formatDate(dateText) {
+  return format(new Date(dateText), "MM/dd/yyyy");
 }
 
 function DiscardedEntry({ entry }) {
@@ -47,9 +54,14 @@ function DiscardedEntry({ entry }) {
 
   return (
     <>
-      <div>{entry.description}</div>
-      <div>{entry.date}</div>
-      <div>
+      <div
+        className="text-gray-800 font-medium truncate"
+        title={entry.description}
+      >
+        {entry.description}
+      </div>
+      <div className="font-light">{formatDate(entry.date)}</div>
+      <div className="font-mono text-right">
         {numbro(entry.amountCents / 100).formatCurrency({
           average: false,
           thousandSeparated: true,
@@ -57,7 +69,12 @@ function DiscardedEntry({ entry }) {
         })}
       </div>
       <div>
-        <button onClick={() => handleUndiscard(entry.id)}>Add to Trail</button>
+        <button
+          className="py-1 px-2 bg-gray-600 text-white mt-2"
+          onClick={() => handleUndiscard(entry.id)}
+        >
+          Restore
+        </button>
       </div>
     </>
   );
@@ -74,10 +91,31 @@ function Trash() {
     return <p>Error.</p>;
   }
 
+  const { discardedEntries } = data;
+
   return (
-    <ul>
-      {data.discardedEntries.map(entry => (
-        <li key={entry.id}>
+    <ul className="text-sm h-screen border-r border-black border-solid overflow-auto">
+      <h2 className="font-bold border-b border-black border-solid p-2 w-40 flex items-center">
+        <Trash2 size={14} color="rgb(120, 120, 120)" />
+        <span className="ml-2">Trash</span>{" "}
+      </h2>
+      {discardedEntries.length === 0 ? (
+        <p className="text-center p-2 text-gray-500">0 discarded entries.</p>
+      ) : (
+        <p className="text-center p-2">
+          {discardedEntries.length}{" "}
+          {discardedEntries.length === 1
+            ? "discarded entry."
+            : "discarded entries."}
+        </p>
+      )}
+      {discardedEntries.map((entry, index) => (
+        <li
+          key={entry.id}
+          className={classNames("w-40 p-2 border-b border-black border-solid", {
+            "border-t": index === 0
+          })}
+        >
           <DiscardedEntry entry={entry} />
         </li>
       ))}
