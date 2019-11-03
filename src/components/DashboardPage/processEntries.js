@@ -1,4 +1,4 @@
-import { sortWith, prop, ascend, descend } from "ramda";
+import { sortWith, prop, ascend } from "ramda";
 import { differenceInDays } from "date-fns";
 import calculateMonths from "./calculateMonths";
 

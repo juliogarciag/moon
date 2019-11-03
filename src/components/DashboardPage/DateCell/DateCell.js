@@ -26,9 +26,9 @@ function DateCell(
     setDate(event.target.value);
   };
 
-  const handleEnter = event => {
+  const handleEnter = async event => {
     if (event.key === "Enter") {
-      save();
+      await save();
       focusNext();
     }
   };

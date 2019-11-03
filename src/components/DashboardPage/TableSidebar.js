@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { sortBy, prop } from "ramda";
 import numbro from "numbro";
 import { Link } from "react-feather";
@@ -57,4 +57,4 @@ function TableSidebar({ entries, years, months, todayTotal, goToEntryId }) {
   );
 }
 
-export default TableSidebar;
+export default memo(TableSidebar);

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useCallback } from "react";
 import { useQuery } from "@apollo/react-hooks";
 import EntriesTable from "./EntriesTable";
 import getEntriesQuery from "./getEntries.graphql";
@@ -6,25 +6,18 @@ import processEntries from "./processEntries";
 import TableSidebar from "./TableSidebar";
 import Trash from "./Trash";
 
-function DashboardPage() {
-  const { loading, error, data } = useQuery(getEntriesQuery);
+function DashboardPage({ rawEntries }) {
+  const { entries, years, months, todayTotal } = processEntries(rawEntries);
 
   const tableWindowRef = useRef(null);
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
-  if (error) {
-    return <p>Error.</p>;
-  }
-
-  const { entries, years, months, todayTotal } = processEntries(data.entries);
-
-  const goToEntryId = entryId => {
-    const entryIndex = entries.findIndex(entry => entry.id === entryId);
-    tableWindowRef.current.scrollToItem(entryIndex);
-  };
+  const goToEntryId = useCallback(
+    entryId => {
+      const entryIndex = entries.findIndex(entry => entry.id === entryId);
+      tableWindowRef.current.scrollToItem(entryIndex);
+    },
+    [entries, tableWindowRef.current]
+  );
 
   return (
     <div className="flex">
@@ -41,4 +34,18 @@ function DashboardPage() {
   );
 }
 
-export default DashboardPage;
+function DashboardPageContainer() {
+  const { loading, error, data } = useQuery(getEntriesQuery);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <p>Error.</p>;
+  }
+
+  return <DashboardPage rawEntries={data.entries} />;
+}
+
+export default DashboardPageContainer;

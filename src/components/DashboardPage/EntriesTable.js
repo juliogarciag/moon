@@ -4,7 +4,8 @@ import React, {
   createContext,
   useContext,
   useCallback,
-  createElement
+  createElement,
+  memo
 } from "react";
 import { useTable } from "react-table";
 import { FixedSizeList } from "react-window";
@@ -55,9 +56,17 @@ function Row({ index, style }) {
   );
 }
 
-function useTableRefs(rowsCount, columnsCount) {
+function useTableRefs(entries, columnsCount) {
   const cellRefs = useRef(
-    useMemo(() => times(() => times(() => null, columnsCount), rowsCount))
+    useMemo(() => {
+      const cellsObject = {};
+
+      entries.forEach(entry => {
+        cellsObject[entry.id] = times(() => null, columnsCount);
+      });
+
+      return cellsObject;
+    }, [entries, columnsCount])
   );
 
   function withCellRef(component) {
@@ -65,20 +74,27 @@ function useTableRefs(rowsCount, columnsCount) {
       const { row, column } = props;
 
       const attachCellRef = element => {
-        cellRefs.current[row.index] = cellRefs.current[row.index] || [];
-        cellRefs.current[row.index][column.index] = element;
+        cellRefs.current[row.original.id][column.index] = element;
       };
 
       const focusNext = useCallback(() => {
         const nextColumn =
-          column.index < columnsCount - 1 ? column.index + 1 : 0;
-        const nextRow = nextColumn === 0 ? row.index + 1 : row.index;
-        const nextCell = cellRefs.current[nextRow][nextColumn];
+          column.index === columnsCount - 1 ? 0 : column.index + 1;
+        const currentRowIndex = entries.findIndex(
+          entry => entry.id === row.original.id
+        );
+        const nextRowEntry =
+          nextColumn === 0
+            ? entries[currentRowIndex + 1]
+            : entries[currentRowIndex];
 
-        if (nextCell) {
-          nextCell.focus();
+        if (nextRowEntry) {
+          const nextCell = cellRefs.current[nextRowEntry.id][nextColumn];
+          if (nextCell) {
+            nextCell.focus();
+          }
         }
-      }, [cellRefs.current]);
+      }, [cellRefs.current, row.original.id, entries]);
 
       return (
         <div>
@@ -97,7 +113,7 @@ function useTableRefs(rowsCount, columnsCount) {
 
 function EntriesTable({ entries, tableWindowRef }) {
   const columnsCount = 3;
-  const withCellRef = useTableRefs(entries.length, columnsCount);
+  const withCellRef = useTableRefs(entries, columnsCount);
 
   const columns = useMemo(
     () => [
@@ -198,4 +214,4 @@ function EntriesTable({ entries, tableWindowRef }) {
   );
 }
 
-export default EntriesTable;
+export default memo(EntriesTable);
