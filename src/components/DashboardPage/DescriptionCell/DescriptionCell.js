@@ -27,15 +27,21 @@ function DescriptionCell(
   const save = () =>
     updateDescription({ variables: { id: entryId, description: value } });
 
-  const handleSubmit = event => {
-    event.preventDefault();
-    focusNext();
+  const handleEnter = async event => {
+    if (event.key === "Enter") {
+      await save();
+      focusNext();
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <Input ref={ref} value={value} onChange={handleChange} onBlur={save} />
-    </form>
+    <Input
+      ref={ref}
+      value={value}
+      onChange={handleChange}
+      onKeyPress={handleEnter}
+      onBlur={save}
+    />
   );
 }
 

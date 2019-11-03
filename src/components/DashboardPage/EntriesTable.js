@@ -1,12 +1,4 @@
-import React, {
-  useMemo,
-  useRef,
-  createContext,
-  useContext,
-  useCallback,
-  createElement,
-  memo
-} from "react";
+import React, { useMemo, useRef, createContext, useContext, memo } from "react";
 import { useTable } from "react-table";
 import { FixedSizeList } from "react-window";
 import { times } from "ramda";
@@ -56,84 +48,68 @@ function Row({ index, style }) {
   );
 }
 
-function useTableRefs(entries, columnsCount) {
-  const cellRefs = useRef(
-    useMemo(() => {
-      const cellsObject = {};
+function useCellRefs(entries, columnsCount) {
+  const cellRefs = useRef({});
 
-      entries.forEach(entry => {
-        cellsObject[entry.id] = times(() => null, columnsCount);
-      });
+  const attachCellRef = (element, row, column) => {
+    const { id } = row.original;
+    cellRefs.current[id] =
+      cellRefs.current[id] || times(() => null, columnsCount);
+    cellRefs.current[id][column.index] = element;
+  };
 
-      return cellsObject;
-    }, [entries, columnsCount])
-  );
+  const focusNext = (row, column) => {
+    const nextColumn = column.index === columnsCount - 1 ? 0 : column.index + 1;
+    const currentRowIndex = entries.findIndex(
+      entry => entry.id === row.original.id
+    );
+    const nextRowEntry =
+      nextColumn === 0
+        ? entries[currentRowIndex + 1]
+        : entries[currentRowIndex];
 
-  function withCellRef(component) {
-    return props => {
-      const { row, column } = props;
+    if (nextRowEntry) {
+      const nextCell = cellRefs.current[nextRowEntry.id][nextColumn];
+      if (nextCell) {
+        nextCell.focus();
+      }
+    }
+  };
 
-      const attachCellRef = useCallback(
-        element => {
-          cellRefs.current[row.original.id][column.index] = element;
-        },
-        [cellRefs.current]
-      );
+  const wrapCell = Component => {
+    return props => (
+      <Component
+        {...props}
+        ref={element => attachCellRef(element, props.row, props.column)}
+        focusNext={() => focusNext(props.row, props.column)}
+      />
+    );
+  };
 
-      const focusNext = useCallback(() => {
-        const nextColumn =
-          column.index === columnsCount - 1 ? 0 : column.index + 1;
-        const currentRowIndex = entries.findIndex(
-          entry => entry.id === row.original.id
-        );
-        const nextRowEntry =
-          nextColumn === 0
-            ? entries[currentRowIndex + 1]
-            : entries[currentRowIndex];
-
-        if (nextRowEntry) {
-          const nextCell = cellRefs.current[nextRowEntry.id][nextColumn];
-          if (nextCell) {
-            nextCell.focus();
-          }
-        }
-      }, [cellRefs.current, row.original.id, entries]);
-
-      return (
-        <div>
-          {createElement(component, {
-            ...props,
-            focusNext,
-            ref: attachCellRef
-          })}
-        </div>
-      );
-    };
-  }
-
-  return withCellRef;
+  return wrapCell;
 }
 
 function EntriesTable({ entries, tableWindowRef }) {
   const columnsCount = 3;
-  const withCellRef = useTableRefs(entries, columnsCount);
+
+  const wrapCell = useCellRefs(entries, columnsCount);
 
   const columns = useMemo(
     () => [
       {
         Header: "Description",
         accessor: "description",
-        Cell: withCellRef(DescriptionCell)
+        Cell: wrapCell(DescriptionCell)
       },
       {
         Header: "Date",
         accessor: "date",
-        Cell: withCellRef(DateCell)
+        Cell: wrapCell(DateCell)
       },
       {
         Header: "Amount",
         accessor: "amountCents",
-        Cell: withCellRef(AmountCentsCell)
+        Cell: wrapCell(AmountCentsCell)
       },
       {
         Header: "Total",
@@ -159,7 +135,7 @@ function EntriesTable({ entries, tableWindowRef }) {
         )
       }
     ],
-    []
+    [entries]
   );
 
   const {
