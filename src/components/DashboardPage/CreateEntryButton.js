@@ -4,7 +4,7 @@ import { PlusSquare } from "react-feather";
 import getEntriesQuery from "./getEntries.graphql";
 import createEntryMutation from "./createEntry.graphql";
 
-function CreateEntryButton({ row: { original } }) {
+function CreateEntryButton({ row: { original: entry } }) {
   const [createEntry] = useMutation(createEntryMutation, {
     update(
       cache,
@@ -23,7 +23,7 @@ function CreateEntryButton({ row: { original } }) {
   const handleCreate = () => {
     createEntry({
       variables: {
-        date: original.date,
+        date: entry.date,
         amountCents: 0,
         description: "New Entry"
       }
@@ -32,7 +32,10 @@ function CreateEntryButton({ row: { original } }) {
 
   return (
     <button onClick={handleCreate} className="mr-2" title="Create Entry">
-      <PlusSquare size={18} />
+      <PlusSquare
+        size={18}
+        strokeWidth={entry.isLastOfMonth || entry.isLastOfYear ? 2.5 : 2}
+      />
     </button>
   );
 }

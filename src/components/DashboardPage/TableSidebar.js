@@ -1,12 +1,18 @@
 import React, { memo } from "react";
-import { sortBy, prop } from "ramda";
+import { sortBy, identity, prop, last } from "ramda";
 import numbro from "numbro";
 import { Link } from "react-feather";
 import getLocalizedMonth from "./getLocalizedMonth";
 
 function TableSidebar({ entries, years, months, todayTotal, goToEntryId }) {
   const goToMostRecentEntry = () => {
-    const mostRecentEntry = sortBy(prop("todayCloseness"), entries)[0];
+    const everyCloseness = entries.map(prop("todayCloseness"));
+    const smallestCloseness = sortBy(identity, everyCloseness)[0];
+    const mostRecentEntries = entries.filter(
+      entry => entry.todayCloseness === smallestCloseness
+    );
+    const mostRecentEntry = last(mostRecentEntries);
+
     if (mostRecentEntry) {
       goToEntryId(mostRecentEntry.id);
     }

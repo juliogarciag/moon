@@ -32,7 +32,7 @@ function updateCacheAfterDelete(cache, entry) {
   });
 }
 
-function DiscardEntryButton({ row: { original } }) {
+function DiscardEntryButton({ row: { original: entry } }) {
   const [discardEntry] = useMutation(discardEntryMutation, {
     update(cache, { data }) {
       const { discardEntry } = data;
@@ -52,20 +52,25 @@ function DiscardEntryButton({ row: { original } }) {
   });
 
   const handleClick = () => {
-    if (original.isNew) {
-      deleteEntry({ variables: { id: original.id } });
+    if (entry.isNew) {
+      deleteEntry({ variables: { id: entry.id } });
     } else {
-      discardEntry({ variables: { id: original.id } });
+      discardEntry({ variables: { id: entry.id } });
     }
+  };
+
+  const iconProps = {
+    size: 18,
+    strokeWidth: entry.isLastOfMonth || entry.isLastOfYear ? 2.5 : 2
   };
 
   return (
     <button
       onClick={handleClick}
       className="mr-1"
-      title={original.isNew ? "Delete Entry" : "Discard Entry"}
+      title={entry.isNew ? "Delete Entry" : "Discard Entry"}
     >
-      {original.isNew ? <XSquare size={18} /> : <Trash2 size={18} />}
+      {entry.isNew ? <XSquare {...iconProps} /> : <Trash2 {...iconProps} />}
     </button>
   );
 }

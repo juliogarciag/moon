@@ -14,7 +14,7 @@ function DashboardPage({ rawEntries }) {
   const goToEntryId = useCallback(
     entryId => {
       const entryIndex = entries.findIndex(entry => entry.id === entryId);
-      tableWindowRef.current.scrollToItem(entryIndex);
+      tableWindowRef.current.scrollToItem(entryIndex, "smart");
     },
     [entries, tableWindowRef.current]
   );

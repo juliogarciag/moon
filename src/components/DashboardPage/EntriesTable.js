@@ -26,12 +26,19 @@ const COLUMN_STYLES = {
 function Row({ index, style }) {
   const { rows, prepareRow } = useContext(PrepareRowsContext);
   const row = rows[index];
+  const entry = row.original;
 
   return (
     prepareRow(row) || (
       <div
         {...row.getRowProps({ style })}
-        className="flex items-center border-b border-r border-solid border-gray-600"
+        className={classNames(
+          "flex items-center border-b border-r border-solid border-gray-600",
+          {
+            "bg-marzipan-300 font-bold": entry.isLastOfMonth,
+            "bg-marzipan-700 font-bold": entry.isLastOfYear
+          }
+        )}
       >
         {row.cells.map(cell => {
           return (
@@ -102,7 +109,11 @@ function EntriesTable({ entries, tableWindowRef }) {
         Cell: wrapCell(DescriptionCell)
       },
       {
-        Header: "Date",
+        Header: () => (
+          <>
+            Date <span className="font-light">(mm/dd/yyyy)</span>
+          </>
+        ),
         accessor: "date",
         Cell: wrapCell(DateCell)
       },
