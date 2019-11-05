@@ -1,4 +1,12 @@
-import React, { useMemo, useRef, createContext, useContext, memo } from "react";
+import React, {
+  useMemo,
+  useRef,
+  createContext,
+  useContext,
+  memo,
+  useState,
+  useEffect
+} from "react";
 import { useTable } from "react-table";
 import { FixedSizeList } from "react-window";
 import { times } from "ramda";
@@ -93,13 +101,21 @@ function useCellRefs(entries, columnsCount) {
     );
   };
 
-  return wrapCell;
+  return { wrapCell, cellRefs };
 }
 
-function EntriesTable({ entries, tableWindowRef }) {
-  const columnsCount = 3;
+const COLUMNS_COUNT = 3;
 
-  const wrapCell = useCellRefs(entries, columnsCount);
+function EntriesTable({ entries, tableWindowRef }) {
+  const [newestEntryId, setNewestEntryId] = useState(null);
+  const { wrapCell, cellRefs } = useCellRefs(entries, COLUMNS_COUNT);
+
+  useEffect(() => {
+    const newCellRefs = cellRefs.current[newestEntryId];
+    if (newestEntryId && newCellRefs && newCellRefs.length > 0) {
+      newCellRefs[0].focus();
+    }
+  }, [newestEntryId, cellRefs.current]);
 
   const columns = useMemo(
     () => [
@@ -140,7 +156,10 @@ function EntriesTable({ entries, tableWindowRef }) {
         id: "actions",
         Cell: props => (
           <div className="flex justify-end">
-            <CreateEntryButton {...props} />
+            <CreateEntryButton
+              {...props}
+              afterCreate={entry => setNewestEntryId(entry.id)}
+            />
             <DiscardEntryButton {...props} />
           </div>
         )

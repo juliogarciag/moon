@@ -7,7 +7,7 @@ function DescriptionCell(
   {
     cell: { value: initialValue },
     row: {
-      original: { id: entryId }
+      original: { id: entryId, isNew }
     },
     focusNext
   },
@@ -41,6 +41,7 @@ function DescriptionCell(
       onChange={handleChange}
       onKeyPress={handleEnter}
       onBlur={save}
+      placeholder={isNew ? "New Entry" : null}
     />
   );
 }
