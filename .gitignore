@@ -31,3 +31,4 @@ yarn-debug.log*
 .yarn-integrity
 
 data.csv
+.DS_Store
