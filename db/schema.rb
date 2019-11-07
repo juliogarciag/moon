@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_02_213357) do
+ActiveRecord::Schema.define(version: 2019_11_05_070941) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -26,4 +26,14 @@ ActiveRecord::Schema.define(version: 2019_11_02_213357) do
     t.index ["discarded_at"], name: "index_entries_on_discarded_at"
   end
 
+  create_table "entry_versions", force: :cascade do |t|
+    t.bigint "entry_id"
+    t.jsonb "entry_attributes"
+    t.jsonb "entry_changes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["entry_id"], name: "index_entry_versions_on_entry_id"
+  end
+
+  add_foreign_key "entry_versions", "entries"
 end
