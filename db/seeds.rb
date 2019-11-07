@@ -1,6 +1,6 @@
 require "csv"
 
-Entry.delete_all
+Entry.destroy_all
 
 CSV.foreach("./data.csv") do |row|
   description, raw_date, raw_amount = row

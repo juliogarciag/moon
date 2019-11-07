@@ -43,8 +43,12 @@ function Row({ index, style }) {
         className={classNames(
           "flex items-center border-b border-r border-solid border-gray-600",
           {
-            "bg-marzipan-300 font-bold": entry.isLastOfMonth,
-            "bg-marzipan-700 font-bold": entry.isLastOfYear
+            [`${
+              entry.isInTheFuture ? "bg-gray-300" : "bg-marzipan-300"
+            } font-bold`]: entry.isLastOfMonth,
+            [`${
+              entry.isInTheFuture ? "bg-gray-500" : "bg-marzipan-700"
+            } font-bold`]: entry.isLastOfYear
           }
         )}
       >

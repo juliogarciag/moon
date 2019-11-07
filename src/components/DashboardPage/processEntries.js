@@ -55,6 +55,7 @@ function processEntries(rawEntries) {
       isNew: entry.isNew,
       totalCents: total,
       todayCloseness: Math.abs(differenceInDays(entry.dateAsDate, today)),
+      isInTheFuture: entry.dateAsDate > today,
       ...getEntryDatePredicates(sortedEntries, entry, index)
     };
   });
