@@ -9,6 +9,7 @@ gem "puma", "~> 3.12"
 gem "webpacker"
 gem "jbuilder", "~> 2.5"
 gem "graphql"
+gem "graphiql-rails"
 gem "bootsnap", ">= 1.1.0", require: false
 gem "discard"
 
@@ -19,7 +20,6 @@ group :development, :test do
 end
 
 group :development do
-  gem "graphiql-rails"
   gem "web-console", ">= 3.3.0"
   gem "listen", ">= 3.0.5", "< 3.2"
   gem "spring"
