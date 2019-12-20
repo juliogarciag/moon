@@ -10,6 +10,7 @@ module Mutations
     def resolve(arguments)
       entry = Entry.create(arguments)
       if entry.persisted?
+        entry.log_version(entry.attributes)
         {
           entry: entry,
           errors: []

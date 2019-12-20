@@ -6,12 +6,7 @@ import createEntryMutation from "./createEntry.graphql";
 
 function CreateEntryButton({ row: { original: entry }, afterCreate }) {
   const [createEntry] = useMutation(createEntryMutation, {
-    update(
-      cache,
-      {
-        data: { createEntry }
-      }
-    ) {
+    update(cache, { data: { createEntry } }) {
       const { entries } = cache.readQuery({ query: getEntriesQuery });
       cache.writeQuery({
         query: getEntriesQuery,

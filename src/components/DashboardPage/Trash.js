@@ -3,10 +3,10 @@ import { useQuery, useMutation } from "@apollo/react-hooks";
 import numbro from "numbro";
 import { Trash2 } from "react-feather";
 import classNames from "classnames";
+import { formatDate } from "lib/formatDateAndTime";
 import getEntriesQuery from "./getEntries.graphql";
 import getDiscardedEntriesQuery from "./getDiscardedEntriesQuery.graphql";
 import undiscardEntryMutation from "./undiscardEntryMutation.graphql";
-import { format } from "date-fns/esm";
 
 function updateCache(cache, entry) {
   const { discardedEntries } = cache.readQuery({
@@ -27,10 +27,6 @@ function updateCache(cache, entry) {
       entries: entries.concat([entry])
     }
   });
-}
-
-function formatDate(dateText) {
-  return format(new Date(dateText), "MM/dd/yyyy");
 }
 
 function DiscardedEntry({ entry }) {

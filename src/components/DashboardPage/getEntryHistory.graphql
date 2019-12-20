@@ -1,0 +1,9 @@
+query entryVersions($entryId: ID!) {
+  entryVersions(entryId: $entryId) {
+    id
+    description
+    date
+    amountCents
+    createdAt
+  }
+}

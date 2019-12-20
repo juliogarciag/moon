@@ -10,11 +10,10 @@ module Mutations
 
     def resolve(arguments)
       entry = Entry.find(arguments[:id])
-      initial_entry_attributes = entry.attributes
       entry.assign_attributes(arguments.except(:id))
 
       if !entry.changed? || entry.save
-        entry.log_version(initial_entry_attributes)
+        entry.log_version(entry.attributes)
         {
           entry: entry,
           errors: []

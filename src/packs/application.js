@@ -2,10 +2,13 @@ import React from "react";
 import "core-js/stable";
 import "regenerator-runtime/runtime";
 import ReactDom from "react-dom";
+import Modal from "react-modal";
 import App from "components/App";
 
 function renderApp(AppComponent) {
-  ReactDom.render(<AppComponent />, document.getElementById("root"));
+  const root = document.getElementById("root");
+  Modal.setAppElement(root);
+  ReactDom.render(<AppComponent />, root);
 }
 
 if (module.hot) {

@@ -18,6 +18,7 @@ import DateCell from "./DateCell";
 import AmountCentsCell from "./AmountCentsCell";
 import CreateEntryButton from "./CreateEntryButton";
 import DiscardEntryButton from "./DiscardEntryButton";
+import ShowHistoryButton from "./ShowHistoryButton";
 
 // NOTE: Bypass re-render of react-window's FixedSizedList component
 // re-rendering FixedSizedList component ends up in focus lose.
@@ -48,7 +49,8 @@ function Row({ index, style }) {
             } font-bold`]: entry.isLastOfMonth,
             [`${
               entry.isInTheFuture ? "bg-gray-500" : "bg-marzipan-700"
-            } font-bold`]: entry.isLastOfYear
+            } font-bold`]: entry.isLastOfYear,
+            "border-t-2": entry.isFirstInTheFuture
           }
         )}
       >
@@ -165,6 +167,7 @@ function EntriesTable({ entries, tableWindowRef }) {
               afterCreate={entry => setNewestEntryId(entry.id)}
             />
             <DiscardEntryButton {...props} />
+            <ShowHistoryButton {...props} />
           </div>
         )
       }

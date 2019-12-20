@@ -40,11 +40,19 @@ function processEntries(rawEntries) {
   const today = new Date();
   let total = 0;
   let todayTotal = 0;
+  let foundFutureEntries = false;
 
   const entries = sortedEntries.map((entry, index) => {
     total += entry.amountCents;
     if (entry.dateAsDate <= today) {
       todayTotal += entry.amountCents;
+    }
+
+    const isInTheFuture = entry.dateAsDate > today;
+    const isFirstInTheFuture = isInTheFuture && !foundFutureEntries;
+
+    if (isFirstInTheFuture) {
+      foundFutureEntries = true;
     }
 
     return {
@@ -55,7 +63,8 @@ function processEntries(rawEntries) {
       isNew: entry.isNew,
       totalCents: total,
       todayCloseness: Math.abs(differenceInDays(entry.dateAsDate, today)),
-      isInTheFuture: entry.dateAsDate > today,
+      isInTheFuture,
+      isFirstInTheFuture,
       ...getEntryDatePredicates(sortedEntries, entry, index)
     };
   });
