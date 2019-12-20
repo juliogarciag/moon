@@ -5,7 +5,7 @@ import DashboardPage from "components/DashboardPage";
 import "./App.css";
 
 const client = new ApolloClient({
-  uri: "http://localhost:3000/graphql"
+  uri: `${location.origin}/graphql`
 });
 
 export default function App() {
