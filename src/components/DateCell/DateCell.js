@@ -1,26 +1,16 @@
 import React, { useState, useEffect, forwardRef } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import Input from "components/Input";
+import { formatDate } from "lib/formatDateAndTime";
 import updateDateMutation from "./updateEntryDate.graphql";
 
-function DateCell(
-  {
-    cell: { value: initialValue },
-    row: {
-      original: { id: entryId }
-    },
-    focusNext
-  },
-  ref
-) {
+const DateCellInput = forwardRef(({ initialValue, entryId }, ref) => {
   const [date, setDate] = useState(initialValue);
   const [updateDate] = useMutation(updateDateMutation);
 
   useEffect(() => {
     setDate(initialValue);
   }, [initialValue]);
-
-  const save = () => updateDate({ variables: { id: entryId, date } });
 
   const handleChange = event => {
     setDate(event.target.value);
@@ -29,9 +19,10 @@ function DateCell(
   const handleEnter = async event => {
     if (event.key === "Enter") {
       await save();
-      focusNext();
     }
   };
+
+  const save = () => updateDate({ variables: { id: entryId, date } });
 
   return (
     <Input
@@ -44,6 +35,23 @@ function DateCell(
       onBlur={save}
     />
   );
+});
+
+function DateCell(
+  {
+    isOpen,
+    cell: { value },
+    row: {
+      original: { id: entryId }
+    }
+  },
+  ref
+) {
+  if (isOpen) {
+    return <DateCellInput entryId={entryId} initialValue={value} ref={ref} />;
+  } else {
+    return <span className="p-2">{formatDate(value)}</span>;
+  }
 }
 
 export default forwardRef(DateCell);
