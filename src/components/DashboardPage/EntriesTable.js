@@ -1,15 +1,12 @@
 import React, {
   useMemo,
-  useRef,
   createContext,
   useContext,
   memo,
-  useState,
-  useEffect
+  useState
 } from "react";
 import { useTable } from "react-table";
 import { FixedSizeList } from "react-window";
-import { times } from "ramda";
 import useWindowSize from "./useWindowSize";
 import classNames from "classnames";
 import numbro from "numbro";
@@ -42,7 +39,7 @@ function Row({ index, style }) {
       <div
         {...row.getRowProps({ style })}
         className={classNames(
-          "flex items-center border-b border-r border-solid border-gray-600",
+          "flex items-center border-b border-r border-solid border-gray-400",
           {
             [`${
               entry.isInTheFuture ? "bg-gray-300" : "bg-marzipan-300"
@@ -69,66 +66,53 @@ function Row({ index, style }) {
   );
 }
 
-function useCellRefs(entries, columnsCount) {
-  const cellRefs = useRef({});
+function wrapEditableCell(Component, selection, setSelection) {
+  return props => {
+    const entryId = props.row.original.id;
+    const columnId = props.column.id;
+    const isSelected =
+      entryId === selection.entryId && columnId === selection.columnId;
 
-  const attachCellRef = (element, row, column) => {
-    const { id } = row.original;
-    cellRefs.current[id] =
-      cellRefs.current[id] || times(() => null, columnsCount);
-    cellRefs.current[id][column.index] = element;
-  };
-
-  const focusNext = (row, column) => {
-    const nextColumn = column.index === columnsCount - 1 ? 0 : column.index + 1;
-    const currentRowIndex = entries.findIndex(
-      entry => entry.id === row.original.id
-    );
-    const nextRowEntry =
-      nextColumn === 0
-        ? entries[currentRowIndex + 1]
-        : entries[currentRowIndex];
-
-    if (nextRowEntry) {
-      const nextCell = cellRefs.current[nextRowEntry.id][nextColumn];
-      if (nextCell) {
-        nextCell.focus();
+    const handleClick = () => {
+      if (!isSelected) {
+        setSelection({ entryId, columnId });
       }
-    }
-  };
+    };
 
-  const wrapCell = Component => {
-    return props => (
-      <Component
-        {...props}
-        ref={element => attachCellRef(element, props.row, props.column)}
-        focusNext={() => focusNext(props.row, props.column)}
-      />
+    const isEntrySpecial = entry => entry.isLastOfMonth || entry.isLastOfYear;
+
+    return (
+      <div
+        onClick={handleClick}
+        className="flex w-full h-full relative"
+        style={{ height: "38px" }}
+      >
+        {isSelected ? (
+          <div className="w-full h-full absolute border-solid border-2 border-blue-600"></div>
+        ) : (
+          <div
+            className={classNames("w-full h-full absolute", {
+              "border-r border-solid border-gray-300": !isEntrySpecial(
+                props.row.original
+              )
+            })}
+          ></div>
+        )}
+        <Component {...props} />
+      </div>
     );
   };
-
-  return { wrapCell, cellRefs };
 }
 
-const COLUMNS_COUNT = 3;
-
 function EntriesTable({ entries, tableWindowRef }) {
-  const [newestEntryId, setNewestEntryId] = useState(null);
-  const { wrapCell, cellRefs } = useCellRefs(entries, COLUMNS_COUNT);
-
-  useEffect(() => {
-    const newCellRefs = cellRefs.current[newestEntryId];
-    if (newestEntryId && newCellRefs && newCellRefs.length > 0) {
-      newCellRefs[0].focus();
-    }
-  }, [newestEntryId, cellRefs.current]);
+  const [selection, setSelection] = useState({ entryId: null, columnId: null });
 
   const columns = useMemo(
     () => [
       {
         Header: "Description",
         accessor: "description",
-        Cell: wrapCell(DescriptionCell)
+        Cell: wrapEditableCell(DescriptionCell, selection, setSelection)
       },
       {
         Header: () => (
@@ -137,12 +121,12 @@ function EntriesTable({ entries, tableWindowRef }) {
           </>
         ),
         accessor: "date",
-        Cell: wrapCell(DateCell)
+        Cell: wrapEditableCell(DateCell, selection, setSelection)
       },
       {
         Header: "Amount",
         accessor: "amountCents",
-        Cell: wrapCell(AmountCentsCell)
+        Cell: wrapEditableCell(AmountCentsCell, selection, setSelection)
       },
       {
         Header: "Total",
@@ -162,17 +146,14 @@ function EntriesTable({ entries, tableWindowRef }) {
         id: "actions",
         Cell: props => (
           <div className="flex justify-end">
-            <CreateEntryButton
-              {...props}
-              afterCreate={entry => setNewestEntryId(entry.id)}
-            />
+            <CreateEntryButton {...props} />
             <DiscardEntryButton {...props} />
             <ShowHistoryButton {...props} />
           </div>
         )
       }
     ],
-    [entries]
+    [entries, selection, setSelection]
   );
 
   const {

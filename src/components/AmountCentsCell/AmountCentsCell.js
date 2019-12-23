@@ -61,7 +61,7 @@ function AmountCentsCell(
     return <AmountCellInput ref={ref} initialValue={value} entryId={entryId} />;
   } else {
     return (
-      <span className="text-right font-mono pr-5 mt-2">
+      <span className="text-right font-mono pr-5 mt-2 ml-auto cursor-default">
         {centsToDecimal(value)}
       </span>
     );

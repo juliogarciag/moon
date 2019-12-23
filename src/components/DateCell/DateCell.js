@@ -50,7 +50,7 @@ function DateCell(
   if (isOpen) {
     return <DateCellInput entryId={entryId} initialValue={value} ref={ref} />;
   } else {
-    return <span className="p-2">{formatDate(value)}</span>;
+    return <span className="p-2 cursor-default">{formatDate(value)}</span>;
   }
 }
 

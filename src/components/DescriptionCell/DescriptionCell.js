@@ -58,7 +58,7 @@ function DescriptionCell(
       />
     );
   } else {
-    return <span className="p-2">{value}</span>;
+    return <span className="p-2 cursor-default">{value}</span>;
   }
 }
 
