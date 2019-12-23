@@ -19,11 +19,11 @@ import AmountCentsCell from "components/AmountCentsCell";
 import CreateEntryButton from "./CreateEntryButton";
 import DiscardEntryButton from "./DiscardEntryButton";
 import ShowHistoryButton from "./ShowHistoryButton";
+import SelectionContext from "./SelectionContext";
 
 // NOTE: Bypass re-render of react-window's FixedSizedList component
 // because re-rendering FixedSizedList component ends up in lose of focus.
 const PrepareRowsContext = createContext();
-const SelectionContext = createContext();
 
 const COLUMN_STYLES = {
   description: "w-4/12",
@@ -126,7 +126,8 @@ function EntriesTable({ entries, tableWindowRef }) {
   const [hasFirstSelectionHappened, setHasFirstSelectionHappened] = useState(
     false
   );
-  const [selection, setSelection] = useState({ entryId: null, columnId: null });
+
+  const { selection, setSelection } = useContext(SelectionContext);
 
   useEffect(() => {
     if (
@@ -212,7 +213,10 @@ function EntriesTable({ entries, tableWindowRef }) {
       const nextColumnId = COLUMNS_ORDER[nextColumnIndex];
 
       if (nextColumnId) {
-        setSelection({ entryId: selection.entryId, columnId: nextColumnId });
+        setSelection({
+          entryId: selection.entryId,
+          columnId: nextColumnId
+        });
       }
     }
   }, [selection, setSelection]);
@@ -224,7 +228,10 @@ function EntriesTable({ entries, tableWindowRef }) {
       const nextColumnId = COLUMNS_ORDER[nextColumnIndex];
 
       if (nextColumnId) {
-        setSelection({ entryId: selection.entryId, columnId: nextColumnId });
+        setSelection({
+          entryId: selection.entryId,
+          columnId: nextColumnId
+        });
       }
     }
   }, [selection, setSelection]);
@@ -238,7 +245,10 @@ function EntriesTable({ entries, tableWindowRef }) {
       const nextEntry = entries[nextIndex];
 
       if (nextEntry) {
-        setSelection({ entryId: nextEntry.id, columnId: selection.columnId });
+        setSelection({
+          entryId: nextEntry.id,
+          columnId: selection.columnId
+        });
       }
     }
   }, [selection, setSelection, entries]);
@@ -252,7 +262,10 @@ function EntriesTable({ entries, tableWindowRef }) {
       const nextEntry = entries[nextIndex];
 
       if (nextEntry) {
-        setSelection({ entryId: nextEntry.id, columnId: selection.columnId });
+        setSelection({
+          entryId: nextEntry.id,
+          columnId: selection.columnId
+        });
       }
     }
   }, [selection, setSelection]);
@@ -266,46 +279,45 @@ function EntriesTable({ entries, tableWindowRef }) {
 
   return (
     <PrepareRowsContext.Provider value={{ rows, prepareRow }}>
-      <SelectionContext.Provider value={{ selection, setSelection }}>
-        <HotKeys
-          {...getTableProps()}
-          className="text-sm w-1/2 outline-none"
-          keyMap={KEY_MAP}
-          handlers={KEY_HANDLERS}
-          allowChanges
-        >
-          <div className="border-b border-solid border-black">
-            {headerGroups.map(headerGroup => (
-              <div {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column, index) => (
-                  <div
-                    {...column.getHeaderProps()}
-                    className={classNames(
-                      "inline-block font-bold p-2",
-                      index === headerGroup.headers.length - 1
-                        ? "border-r border-solid border-black"
-                        : "",
-                      COLUMN_STYLES[column.id]
-                    )}
-                  >
-                    {column.render("Header")}
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-          <div {...getTableBodyProps()}>
-            <FixedSizeList
-              height={tableHeight}
-              itemCount={rows.length}
-              itemSize={38}
-              ref={tableWindowRef}
-            >
-              {Row}
-            </FixedSizeList>
-          </div>
-        </HotKeys>
-      </SelectionContext.Provider>
+      <HotKeys
+        {...getTableProps()}
+        className="text-sm w-1/2 outline-none"
+        data-entries-table
+        keyMap={KEY_MAP}
+        handlers={KEY_HANDLERS}
+        allowChanges
+      >
+        <div className="border-b border-solid border-black">
+          {headerGroups.map(headerGroup => (
+            <div {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map((column, index) => (
+                <div
+                  {...column.getHeaderProps()}
+                  className={classNames(
+                    "inline-block font-bold p-2",
+                    index === headerGroup.headers.length - 1
+                      ? "border-r border-solid border-black"
+                      : "",
+                    COLUMN_STYLES[column.id]
+                  )}
+                >
+                  {column.render("Header")}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div {...getTableBodyProps()}>
+          <FixedSizeList
+            height={tableHeight}
+            itemCount={rows.length}
+            itemSize={38}
+            ref={tableWindowRef}
+          >
+            {Row}
+          </FixedSizeList>
+        </div>
+      </HotKeys>
     </PrepareRowsContext.Provider>
   );
 }

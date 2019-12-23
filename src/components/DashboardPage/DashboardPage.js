@@ -1,5 +1,6 @@
-import React, { useRef, useCallback } from "react";
+import React, { useRef, useCallback, useState } from "react";
 import { useQuery } from "@apollo/react-hooks";
+import SelectionContext from "./SelectionContext";
 import EntriesTable from "./EntriesTable";
 import getEntriesQuery from "./getEntries.graphql";
 import processEntries from "./processEntries";
@@ -12,25 +13,42 @@ function DashboardPage({ rawEntries }) {
   const tableWindowRef = useRef(null);
 
   const goToEntryId = useCallback(
-    entryId => {
+    (entryId, columnId = "description") => {
       const entryIndex = entries.findIndex(entry => entry.id === entryId);
       tableWindowRef.current.scrollToItem(entryIndex, "smart");
+      document.querySelector("[data-entries-table]").focus();
+      selectionSetter({ entryId, columnId });
     },
     [entries, tableWindowRef.current]
   );
 
+  const [selection, selectionSetter] = useState({
+    entryId: null,
+    columnId: null
+  });
+
+  const setSelection = selection => {
+    if (selection.entryId) {
+      goToEntryId(selection.entryId, selection.columnId);
+    } else {
+      selectionSetter(selection);
+    }
+  };
+
   return (
-    <div className="flex">
-      <EntriesTable entries={entries} tableWindowRef={tableWindowRef} />
-      <TableSidebar
-        entries={entries}
-        years={years}
-        months={months}
-        todayTotal={todayTotal}
-        goToEntryId={goToEntryId}
-      />
-      <Trash />
-    </div>
+    <SelectionContext.Provider value={{ selection, setSelection }}>
+      <div className="flex">
+        <EntriesTable entries={entries} tableWindowRef={tableWindowRef} />
+        <TableSidebar
+          entries={entries}
+          years={years}
+          months={months}
+          todayTotal={todayTotal}
+          goToEntryId={goToEntryId}
+        />
+        <Trash />
+      </div>
+    </SelectionContext.Provider>
   );
 }
 
