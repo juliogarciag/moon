@@ -4,13 +4,15 @@ import React, {
   useContext,
   memo,
   useState,
-  useEffect
+  useEffect,
+  useCallback
 } from "react";
 import { useTable } from "react-table";
 import { FixedSizeList } from "react-window";
-import useWindowSize from "./useWindowSize";
 import classNames from "classnames";
 import numbro from "numbro";
+import { HotKeys } from "react-hotkeys";
+import useWindowSize from "./useWindowSize";
 import DescriptionCell from "components/DescriptionCell";
 import DateCell from "components/DateCell";
 import AmountCentsCell from "components/AmountCentsCell";
@@ -19,8 +21,9 @@ import DiscardEntryButton from "./DiscardEntryButton";
 import ShowHistoryButton from "./ShowHistoryButton";
 
 // NOTE: Bypass re-render of react-window's FixedSizedList component
-// re-rendering FixedSizedList component ends up in focus lose.
+// because re-rendering FixedSizedList component ends up in lose of focus.
 const PrepareRowsContext = createContext();
+const SelectionContext = createContext();
 
 const COLUMN_STYLES = {
   description: "w-4/12",
@@ -67,8 +70,9 @@ function Row({ index, style }) {
   );
 }
 
-function wrapEditableCell(Component, selection, setSelection) {
+function wrapEditableCell(Component) {
   return props => {
+    const { selection, setSelection } = useContext(SelectionContext);
     const entryId = props.row.original.id;
     const columnId = props.column.id;
     const isSelected =
@@ -105,6 +109,19 @@ function wrapEditableCell(Component, selection, setSelection) {
   };
 }
 
+const WrappedDescriptionCell = wrapEditableCell(DescriptionCell);
+const WrappedDateCell = wrapEditableCell(DateCell);
+const WrappedAmountCell = wrapEditableCell(AmountCentsCell);
+
+const COLUMNS_ORDER = ["description", "date", "amountCents"];
+
+const KEY_MAP = {
+  MOVE_UP: "up",
+  MOVE_RIGHT: "right",
+  MOVE_DOWN: "down",
+  MOVE_LEFT: "left"
+};
+
 function EntriesTable({ entries, tableWindowRef }) {
   const [hasFirstSelectionHappened, setHasFirstSelectionHappened] = useState(
     false
@@ -127,7 +144,7 @@ function EntriesTable({ entries, tableWindowRef }) {
       {
         Header: "Description",
         accessor: "description",
-        Cell: wrapEditableCell(DescriptionCell, selection, setSelection)
+        Cell: WrappedDescriptionCell
       },
       {
         Header: () => (
@@ -136,12 +153,12 @@ function EntriesTable({ entries, tableWindowRef }) {
           </>
         ),
         accessor: "date",
-        Cell: wrapEditableCell(DateCell, selection, setSelection)
+        Cell: WrappedDateCell
       },
       {
         Header: "Amount",
         accessor: "amountCents",
-        Cell: wrapEditableCell(AmountCentsCell, selection, setSelection)
+        Cell: WrappedAmountCell
       },
       {
         Header: "Total",
@@ -188,40 +205,107 @@ function EntriesTable({ entries, tableWindowRef }) {
     return windowSize.innerHeight - headerHeight;
   }, [windowSize]);
 
+  const handleRight = useCallback(() => {
+    if (selection.entryId) {
+      const currentColumnIndex = COLUMNS_ORDER.indexOf(selection.columnId);
+      const nextColumnIndex = currentColumnIndex + 1;
+      const nextColumnId = COLUMNS_ORDER[nextColumnIndex];
+
+      if (nextColumnId) {
+        setSelection({ entryId: selection.entryId, columnId: nextColumnId });
+      }
+    }
+  }, [selection, setSelection]);
+
+  const handleLeft = useCallback(() => {
+    if (selection.entryId) {
+      const currentColumnIndex = COLUMNS_ORDER.indexOf(selection.columnId);
+      const nextColumnIndex = currentColumnIndex - 1;
+      const nextColumnId = COLUMNS_ORDER[nextColumnIndex];
+
+      if (nextColumnId) {
+        setSelection({ entryId: selection.entryId, columnId: nextColumnId });
+      }
+    }
+  }, [selection, setSelection]);
+
+  const handleUp = useCallback(() => {
+    if (selection.entryId) {
+      const entryIndex = entries.findIndex(
+        entry => entry.id === selection.entryId
+      );
+      const nextIndex = entryIndex - 1;
+      const nextEntry = entries[nextIndex];
+
+      if (nextEntry) {
+        setSelection({ entryId: nextEntry.id, columnId: selection.columnId });
+      }
+    }
+  }, [selection, setSelection, entries]);
+
+  const handleDown = useCallback(() => {
+    if (selection.entryId) {
+      const entryIndex = entries.findIndex(
+        entry => entry.id === selection.entryId
+      );
+      const nextIndex = entryIndex + 1;
+      const nextEntry = entries[nextIndex];
+
+      if (nextEntry) {
+        setSelection({ entryId: nextEntry.id, columnId: selection.columnId });
+      }
+    }
+  }, [selection, setSelection]);
+
+  const KEY_HANDLERS = {
+    MOVE_RIGHT: handleRight,
+    MOVE_LEFT: handleLeft,
+    MOVE_UP: handleUp,
+    MOVE_DOWN: handleDown
+  };
+
   return (
     <PrepareRowsContext.Provider value={{ rows, prepareRow }}>
-      <div {...getTableProps()} className="text-sm w-1/2">
-        <div className="border-b border-solid border-black">
-          {headerGroups.map(headerGroup => (
-            <div {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column, index) => (
-                <div
-                  {...column.getHeaderProps()}
-                  className={classNames(
-                    "inline-block font-bold p-2",
-                    index === headerGroup.headers.length - 1
-                      ? "border-r border-solid border-black"
-                      : "",
-                    COLUMN_STYLES[column.id]
-                  )}
-                >
-                  {column.render("Header")}
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-        <div {...getTableBodyProps()}>
-          <FixedSizeList
-            height={tableHeight}
-            itemCount={rows.length}
-            itemSize={38}
-            ref={tableWindowRef}
-          >
-            {Row}
-          </FixedSizeList>
-        </div>
-      </div>
+      <SelectionContext.Provider value={{ selection, setSelection }}>
+        <HotKeys
+          {...getTableProps()}
+          className="text-sm w-1/2 outline-none"
+          keyMap={KEY_MAP}
+          handlers={KEY_HANDLERS}
+          allowChanges
+        >
+          <div className="border-b border-solid border-black">
+            {headerGroups.map(headerGroup => (
+              <div {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map((column, index) => (
+                  <div
+                    {...column.getHeaderProps()}
+                    className={classNames(
+                      "inline-block font-bold p-2",
+                      index === headerGroup.headers.length - 1
+                        ? "border-r border-solid border-black"
+                        : "",
+                      COLUMN_STYLES[column.id]
+                    )}
+                  >
+                    {column.render("Header")}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+          <div {...getTableBodyProps()}>
+            <FixedSizeList
+              height={tableHeight}
+              itemCount={rows.length}
+              itemSize={38}
+              ref={tableWindowRef}
+            >
+              {Row}
+            </FixedSizeList>
+          </div>
+        </HotKeys>
+      </SelectionContext.Provider>
     </PrepareRowsContext.Provider>
   );
 }
