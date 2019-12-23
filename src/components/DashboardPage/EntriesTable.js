@@ -3,7 +3,8 @@ import React, {
   createContext,
   useContext,
   memo,
-  useState
+  useState,
+  useEffect
 } from "react";
 import { useTable } from "react-table";
 import { FixedSizeList } from "react-window";
@@ -105,7 +106,21 @@ function wrapEditableCell(Component, selection, setSelection) {
 }
 
 function EntriesTable({ entries, tableWindowRef }) {
+  const [hasFirstSelectionHappened, setHasFirstSelectionHappened] = useState(
+    false
+  );
   const [selection, setSelection] = useState({ entryId: null, columnId: null });
+
+  useEffect(() => {
+    if (
+      entries.length > 0 &&
+      !hasFirstSelectionHappened &&
+      selection.entryId === null
+    ) {
+      setSelection({ entryId: entries[0].id, columnId: "description" });
+      setHasFirstSelectionHappened(true);
+    }
+  }, [entries]);
 
   const columns = useMemo(
     () => [
