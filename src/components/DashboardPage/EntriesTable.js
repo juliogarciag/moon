@@ -119,7 +119,11 @@ const KEY_MAP = {
   MOVE_UP: "up",
   MOVE_RIGHT: "right",
   MOVE_DOWN: "down",
-  MOVE_LEFT: "left"
+  MOVE_LEFT: "left",
+  PAGE_DOWN: "pagedown",
+  PAGE_UP: "pageup",
+  HOME: "home",
+  END: "end"
 };
 
 function EntriesTable({ entries, tableWindowRef }) {
@@ -268,13 +272,73 @@ function EntriesTable({ entries, tableWindowRef }) {
         });
       }
     }
-  }, [selection, setSelection]);
+  }, [selection, setSelection, entries]);
+
+  const handlePageDown = useCallback(() => {
+    if (selection.entryId) {
+      const entryIndex = entries.findIndex(
+        entry => entry.id === selection.entryId
+      );
+      const nextIndex = entryIndex + 20;
+      const nextEntry = entries[nextIndex] || entries[entries.length - 1];
+
+      if (nextEntry) {
+        setSelection({
+          entryId: nextEntry.id,
+          columnId: selection.columnId
+        });
+      }
+    }
+  }, [selection, setSelection, entries]);
+
+  const handlePageUp = useCallback(() => {
+    if (selection.entryId) {
+      const entryIndex = entries.findIndex(
+        entry => entry.id === selection.entryId
+      );
+      const nextIndex = entryIndex - 20;
+      const nextEntry = entries[nextIndex] || entries[0];
+
+      if (nextEntry) {
+        setSelection({
+          entryId: nextEntry.id,
+          columnId: selection.columnId
+        });
+      }
+    }
+  }, [selection, setSelection, entries]);
+
+  const handleHome = useCallback(() => {
+    const nextEntry = entries[0];
+
+    if (nextEntry) {
+      setSelection({
+        entryId: nextEntry.id,
+        columnId: selection.columnId || "description"
+      });
+    }
+  }, [selection, setSelection, entries]);
+
+  const handleEnd = useCallback(() => {
+    const nextEntry = entries[entries.length - 1];
+
+    if (nextEntry) {
+      setSelection({
+        entryId: nextEntry.id,
+        columnId: selection.columnId || "description"
+      });
+    }
+  }, [selection, setSelection, entries]);
 
   const KEY_HANDLERS = {
     MOVE_RIGHT: handleRight,
     MOVE_LEFT: handleLeft,
     MOVE_UP: handleUp,
-    MOVE_DOWN: handleDown
+    MOVE_DOWN: handleDown,
+    PAGE_DOWN: handlePageDown,
+    PAGE_UP: handlePageUp,
+    HOME: handleHome,
+    END: handleEnd
   };
 
   return (
