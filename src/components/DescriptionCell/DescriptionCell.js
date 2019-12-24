@@ -1,4 +1,4 @@
-import React, { useState, useEffect, forwardRef } from "react";
+import React, { useState, useEffect, forwardRef, useRef } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import updateDescriptionMutation from "./updateEntryDescription.graphql";
 import Input from "components/Input";
@@ -8,15 +8,15 @@ const DescriptionCellInput = forwardRef(
     const [value, setValue] = useState(initialValue);
     const [updateDescription] = useMutation(updateDescriptionMutation);
 
-    const save = value =>
+    const save = () =>
       updateDescription({ variables: { id: entryId, description: value } });
 
     useEffect(() => {
       setValue(initialValue);
     }, [initialValue]);
 
-    const handleChange = e => {
-      setValue(e.target.value);
+    const handleChange = event => {
+      setValue(event.target.value);
     };
 
     const handleEnter = async event => {
@@ -38,23 +38,28 @@ const DescriptionCellInput = forwardRef(
   }
 );
 
-function DescriptionCell(
-  {
-    isOpen,
-    cell: { value },
-    row: {
-      original: { id: entryId, isNew }
+function DescriptionCell({
+  isOpen,
+  cell: { value },
+  row: {
+    original: { id: entryId, isNew }
+  }
+}) {
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      inputRef.current.focus();
     }
-  },
-  ref
-) {
+  }, [isOpen, inputRef]);
+
   if (isOpen) {
     return (
       <DescriptionCellInput
         entryId={entryId}
         initialValue={value}
         isNew={isNew}
-        ref={ref}
+        ref={inputRef}
       />
     );
   } else {
@@ -62,4 +67,4 @@ function DescriptionCell(
   }
 }
 
-export default forwardRef(DescriptionCell);
+export default DescriptionCell;

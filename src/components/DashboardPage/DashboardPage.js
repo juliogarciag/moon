@@ -13,23 +13,24 @@ function DashboardPage({ rawEntries }) {
   const tableWindowRef = useRef(null);
 
   const goToEntryId = useCallback(
-    (entryId, columnId = "description") => {
+    (entryId, columnId = "description", isOpen = false) => {
       const entryIndex = entries.findIndex(entry => entry.id === entryId);
       tableWindowRef.current.scrollToItem(entryIndex, "smart");
       document.querySelector("[data-entries-table]").focus();
-      selectionSetter({ entryId, columnId });
+      selectionSetter({ entryId, columnId, isOpen });
     },
     [entries, tableWindowRef.current]
   );
 
   const [selection, selectionSetter] = useState({
     entryId: null,
-    columnId: null
+    columnId: null,
+    isOpen: false
   });
 
   const setSelection = selection => {
     if (selection.entryId) {
-      goToEntryId(selection.entryId, selection.columnId);
+      goToEntryId(selection.entryId, selection.columnId, selection.isOpen);
     } else {
       selectionSetter(selection);
     }

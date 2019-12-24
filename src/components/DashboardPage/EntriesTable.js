@@ -79,8 +79,10 @@ function wrapEditableCell(Component) {
       entryId === selection.entryId && columnId === selection.columnId;
 
     const handleClick = () => {
-      if (!isSelected) {
-        setSelection({ entryId, columnId });
+      if (isSelected) {
+        setSelection({ ...selection, isOpen: true });
+      } else {
+        setSelection({ entryId, columnId, isOpen: false });
       }
     };
 
@@ -93,7 +95,7 @@ function wrapEditableCell(Component) {
         style={{ height: "38px" }}
       >
         {isSelected ? (
-          <div className="w-full h-full absolute border-solid border-2 border-blue-600"></div>
+          <div className="pointer-events-none w-full h-full absolute border-solid border-2 border-blue-600"></div>
         ) : (
           <div
             className={classNames("w-full h-full absolute", {
@@ -103,7 +105,7 @@ function wrapEditableCell(Component) {
             })}
           ></div>
         )}
-        <Component {...props} />
+        <Component {...props} isOpen={isSelected && selection.isOpen} />
       </div>
     );
   };
@@ -123,7 +125,8 @@ const KEY_MAP = {
   PAGE_DOWN: "pagedown",
   PAGE_UP: "pageup",
   HOME: "home",
-  END: "end"
+  END: "end",
+  ENTER: "enter"
 };
 
 function EntriesTable({ entries, tableWindowRef }) {
@@ -139,7 +142,11 @@ function EntriesTable({ entries, tableWindowRef }) {
       !hasFirstSelectionHappened &&
       selection.entryId === null
     ) {
-      setSelection({ entryId: entries[0].id, columnId: "description" });
+      setSelection({
+        entryId: entries[0].id,
+        columnId: "description",
+        isOpen: false
+      });
       setHasFirstSelectionHappened(true);
     }
   }, [entries]);
@@ -219,7 +226,8 @@ function EntriesTable({ entries, tableWindowRef }) {
       if (nextColumnId) {
         setSelection({
           entryId: selection.entryId,
-          columnId: nextColumnId
+          columnId: nextColumnId,
+          isOpen: false
         });
       }
     }
@@ -234,7 +242,8 @@ function EntriesTable({ entries, tableWindowRef }) {
       if (nextColumnId) {
         setSelection({
           entryId: selection.entryId,
-          columnId: nextColumnId
+          columnId: nextColumnId,
+          isOpen: false
         });
       }
     }
@@ -251,7 +260,8 @@ function EntriesTable({ entries, tableWindowRef }) {
       if (nextEntry) {
         setSelection({
           entryId: nextEntry.id,
-          columnId: selection.columnId
+          columnId: selection.columnId,
+          isOpen: false
         });
       }
     }
@@ -268,7 +278,8 @@ function EntriesTable({ entries, tableWindowRef }) {
       if (nextEntry) {
         setSelection({
           entryId: nextEntry.id,
-          columnId: selection.columnId
+          columnId: selection.columnId,
+          isOpen: false
         });
       }
     }
@@ -285,7 +296,8 @@ function EntriesTable({ entries, tableWindowRef }) {
       if (nextEntry) {
         setSelection({
           entryId: nextEntry.id,
-          columnId: selection.columnId
+          columnId: selection.columnId,
+          isOpen: false
         });
       }
     }
@@ -302,7 +314,8 @@ function EntriesTable({ entries, tableWindowRef }) {
       if (nextEntry) {
         setSelection({
           entryId: nextEntry.id,
-          columnId: selection.columnId
+          columnId: selection.columnId,
+          isOpen: false
         });
       }
     }
@@ -314,7 +327,8 @@ function EntriesTable({ entries, tableWindowRef }) {
     if (nextEntry) {
       setSelection({
         entryId: nextEntry.id,
-        columnId: selection.columnId || "description"
+        columnId: selection.columnId || "description",
+        isOpen: false
       });
     }
   }, [selection, setSelection, entries]);
@@ -325,10 +339,17 @@ function EntriesTable({ entries, tableWindowRef }) {
     if (nextEntry) {
       setSelection({
         entryId: nextEntry.id,
-        columnId: selection.columnId || "description"
+        columnId: selection.columnId || "description",
+        isOpen: false
       });
     }
   }, [selection, setSelection, entries]);
+
+  const handleEnter = useCallback(() => {
+    if (selection.entryId) {
+      setSelection({ ...selection, isOpen: true });
+    }
+  }, [selection, setSelection]);
 
   const KEY_HANDLERS = {
     MOVE_RIGHT: handleRight,
@@ -338,7 +359,8 @@ function EntriesTable({ entries, tableWindowRef }) {
     PAGE_DOWN: handlePageDown,
     PAGE_UP: handlePageUp,
     HOME: handleHome,
-    END: handleEnd
+    END: handleEnd,
+    ENTER: handleEnter
   };
 
   return (
