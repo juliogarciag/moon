@@ -220,8 +220,6 @@ function EntriesTable({ entries, tableWindowRef }) {
   }, [windowSize]);
 
   const handleRight = useCallback(() => {
-    debugger;
-
     if (selection.entryId) {
       const currentColumnIndex = COLUMNS_ORDER.indexOf(selection.columnId);
       const nextColumnIndex = currentColumnIndex + 1;
