@@ -1,4 +1,4 @@
-import React, { useState, useEffect, forwardRef } from "react";
+import React, { useState, useEffect, forwardRef, useRef } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import updateAmountCentsMutation from "./updateEntryAmountCents.graphql";
 import Input from "components/Input";
@@ -47,18 +47,25 @@ const AmountCellInput = forwardRef(({ initialValue, entryId }, ref) => {
   );
 });
 
-function AmountCentsCell(
-  {
-    isOpen,
-    cell: { value },
-    row: {
-      original: { id: entryId }
+function AmountCentsCell({
+  isOpen,
+  cell: { value },
+  row: {
+    original: { id: entryId }
+  }
+}) {
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      inputRef.current.focus();
     }
-  },
-  ref
-) {
+  }, [isOpen, inputRef]);
+
   if (isOpen) {
-    return <AmountCellInput ref={ref} initialValue={value} entryId={entryId} />;
+    return (
+      <AmountCellInput ref={inputRef} initialValue={value} entryId={entryId} />
+    );
   } else {
     return (
       <span className="text-right font-mono pr-5 mt-2 ml-auto cursor-default">
@@ -68,4 +75,4 @@ function AmountCentsCell(
   }
 }
 
-export default forwardRef(AmountCentsCell);
+export default AmountCentsCell;

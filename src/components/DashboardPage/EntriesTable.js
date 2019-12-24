@@ -80,7 +80,9 @@ function wrapEditableCell(Component) {
 
     const handleClick = () => {
       if (isSelected) {
-        setSelection({ ...selection, isOpen: true });
+        if (!selection.isOpen) {
+          setSelection({ ...selection, isOpen: true });
+        }
       } else {
         setSelection({ entryId, columnId, isOpen: false });
       }
@@ -218,6 +220,8 @@ function EntriesTable({ entries, tableWindowRef }) {
   }, [windowSize]);
 
   const handleRight = useCallback(() => {
+    debugger;
+
     if (selection.entryId) {
       const currentColumnIndex = COLUMNS_ORDER.indexOf(selection.columnId);
       const nextColumnIndex = currentColumnIndex + 1;
@@ -367,7 +371,7 @@ function EntriesTable({ entries, tableWindowRef }) {
     <PrepareRowsContext.Provider value={{ rows, prepareRow }}>
       <HotKeys
         {...getTableProps()}
-        className="text-sm w-1/2 outline-none"
+        className="text-sm w-1/2"
         data-entries-table
         keyMap={KEY_MAP}
         handlers={KEY_HANDLERS}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, forwardRef } from "react";
+import React, { useState, useEffect, forwardRef, useRef } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import Input from "components/Input";
 import { formatDate } from "lib/formatDateAndTime";
@@ -37,21 +37,28 @@ const DateCellInput = forwardRef(({ initialValue, entryId }, ref) => {
   );
 });
 
-function DateCell(
-  {
-    isOpen,
-    cell: { value },
-    row: {
-      original: { id: entryId }
+function DateCell({
+  isOpen,
+  cell: { value },
+  row: {
+    original: { id: entryId }
+  }
+}) {
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      inputRef.current.focus();
     }
-  },
-  ref
-) {
+  }, [isOpen, inputRef]);
+
   if (isOpen) {
-    return <DateCellInput entryId={entryId} initialValue={value} ref={ref} />;
+    return (
+      <DateCellInput entryId={entryId} initialValue={value} ref={inputRef} />
+    );
   } else {
     return <span className="p-2 cursor-default">{formatDate(value)}</span>;
   }
 }
 
-export default forwardRef(DateCell);
+export default DateCell;

@@ -19,10 +19,10 @@ const DescriptionCellInput = forwardRef(
       setValue(event.target.value);
     };
 
-    const handleEnter = async event => {
-      if (event.key === "Enter") {
-        await save();
-      }
+    const handleEnter = async () => {
+      // if (event.key === "Enter") {
+      //   await save();
+      // }
     };
 
     return (
