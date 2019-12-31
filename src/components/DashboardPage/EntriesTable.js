@@ -11,7 +11,6 @@ import { useTable } from "react-table";
 import { FixedSizeList } from "react-window";
 import classNames from "classnames";
 import numbro from "numbro";
-import { HotKeys } from "react-hotkeys";
 import useWindowSize from "./useWindowSize";
 import DescriptionCell from "components/DescriptionCell";
 import DateCell from "components/DateCell";
@@ -88,10 +87,9 @@ function wrapEditableCell(Component) {
       }
     };
 
-    const closeCell = useCallback(
-      () => setSelection({ ...selection, isOpen: false }),
-      [selection, setSelection]
-    );
+    const closeCell = useCallback(() => {
+      setSelection({ ...selection, isOpen: false });
+    }, [selection, setSelection]);
 
     const isEntrySpecial = entry => entry.isLastOfMonth || entry.isLastOfYear;
 
@@ -127,18 +125,6 @@ const WrappedDateCell = wrapEditableCell(DateCell);
 const WrappedAmountCell = wrapEditableCell(AmountCentsCell);
 
 const COLUMNS_ORDER = ["description", "date", "amountCents"];
-
-const KEY_MAP = {
-  MOVE_UP: "up",
-  MOVE_RIGHT: "right",
-  MOVE_DOWN: "down",
-  MOVE_LEFT: "left",
-  PAGE_DOWN: "pagedown",
-  PAGE_UP: "pageup",
-  HOME: "home",
-  END: "end",
-  ENTER: "enter"
-};
 
 function EntriesTable({ entries, tableWindowRef }) {
   const [hasFirstSelectionHappened, setHasFirstSelectionHappened] = useState(
@@ -363,26 +349,32 @@ function EntriesTable({ entries, tableWindowRef }) {
   }, [selection, setSelection]);
 
   const KEY_HANDLERS = {
-    MOVE_RIGHT: handleRight,
-    MOVE_LEFT: handleLeft,
-    MOVE_UP: handleUp,
-    MOVE_DOWN: handleDown,
-    PAGE_DOWN: handlePageDown,
-    PAGE_UP: handlePageUp,
-    HOME: handleHome,
-    END: handleEnd,
-    ENTER: handleEnter
+    ArrowRight: handleRight,
+    ArrowLeft: handleLeft,
+    ArrowUp: handleUp,
+    ArrowDown: handleDown,
+    PageDown: handlePageDown,
+    PageUp: handlePageUp,
+    Home: handleHome,
+    End: handleEnd,
+    Enter: handleEnter
+  };
+
+  const handleKeyDown = event => {
+    const handler = KEY_HANDLERS[event.key];
+    if (handler) {
+      handler();
+    }
   };
 
   return (
     <PrepareRowsContext.Provider value={{ rows, prepareRow }}>
-      <HotKeys
+      <div
         {...getTableProps()}
+        onKeyDown={handleKeyDown}
+        tabIndex="0"
         className="text-sm w-1/2 outline-none"
         data-entries-table
-        keyMap={KEY_MAP}
-        handlers={KEY_HANDLERS}
-        allowChanges
       >
         <div className="border-b border-solid border-black">
           {headerGroups.map(headerGroup => (
@@ -414,7 +406,7 @@ function EntriesTable({ entries, tableWindowRef }) {
             {Row}
           </FixedSizeList>
         </div>
-      </HotKeys>
+      </div>
     </PrepareRowsContext.Provider>
   );
 }

@@ -22,9 +22,9 @@ const AmountCellInput = forwardRef(
       setAmountInDecimal(event.target.value.toString());
     };
 
-    const handleEnter = async event => {
+    const handleEnter = event => {
       if (event.key === "Enter") {
-        await save();
+        save();
         closeCell();
       }
     };
@@ -35,6 +35,8 @@ const AmountCellInput = forwardRef(
       });
     };
 
+    const stopPropagation = event => event.stopPropagation();
+
     return (
       <Input
         ref={ref}
@@ -44,6 +46,7 @@ const AmountCellInput = forwardRef(
         value={amountInDecimal}
         onChange={handleChange}
         onKeyPress={handleEnter}
+        onKeyDown={stopPropagation}
         onBlur={save}
       />
     );

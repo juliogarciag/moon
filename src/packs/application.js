@@ -3,7 +3,6 @@ import "core-js/stable";
 import "regenerator-runtime/runtime";
 import ReactDom from "react-dom";
 import Modal from "react-modal";
-import { configure } from "react-hotkeys";
 import App from "components/App";
 
 function renderApp(AppComponent) {
@@ -11,8 +10,6 @@ function renderApp(AppComponent) {
   Modal.setAppElement(root);
   ReactDom.render(<AppComponent />, root);
 }
-
-configure({ ignoreRepeatedEventsWhenKeyHeldDown: false });
 
 if (module.hot) {
   module.hot.accept("components/App/index.js", () => {

@@ -17,14 +17,16 @@ const DateCellInput = forwardRef(
       setDate(event.target.value);
     };
 
-    const handleEnter = async event => {
+    const handleEnter = event => {
       if (event.key === "Enter") {
-        await save();
+        save();
         closeCell();
       }
     };
 
     const save = () => updateDate({ variables: { id: entryId, date } });
+
+    const stopPropagation = event => event.stopPropagation();
 
     return (
       <Input
@@ -33,6 +35,7 @@ const DateCellInput = forwardRef(
         ref={ref}
         value={date}
         onChange={handleChange}
+        onKeyDown={stopPropagation}
         onKeyPress={handleEnter}
         onBlur={save}
       />

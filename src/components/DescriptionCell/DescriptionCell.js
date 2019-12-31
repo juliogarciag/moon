@@ -19,9 +19,11 @@ const DescriptionCellInput = forwardRef(
       setValue(event.target.value);
     };
 
-    const handleEnter = async () => {
+    const stopPropagation = event => event.stopPropagation();
+
+    const handleEnter = () => {
       if (event.key === "Enter") {
-        await save();
+        save();
         closeCell();
       }
     };
@@ -32,6 +34,7 @@ const DescriptionCellInput = forwardRef(
         value={value}
         onChange={handleChange}
         onKeyPress={handleEnter}
+        onKeyDown={stopPropagation}
         onBlur={save}
         placeholder={isNew ? "New Entry" : null}
       />
