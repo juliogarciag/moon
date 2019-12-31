@@ -4,7 +4,7 @@ import updateDescriptionMutation from "./updateEntryDescription.graphql";
 import Input from "components/Input";
 
 const DescriptionCellInput = forwardRef(
-  ({ initialValue, entryId, isNew }, ref) => {
+  ({ initialValue, entryId, isNew, closeCell }, ref) => {
     const [value, setValue] = useState(initialValue);
     const [updateDescription] = useMutation(updateDescriptionMutation);
 
@@ -20,9 +20,10 @@ const DescriptionCellInput = forwardRef(
     };
 
     const handleEnter = async () => {
-      // if (event.key === "Enter") {
-      //   await save();
-      // }
+      if (event.key === "Enter") {
+        await save();
+        closeCell();
+      }
     };
 
     return (
@@ -40,6 +41,7 @@ const DescriptionCellInput = forwardRef(
 
 function DescriptionCell({
   isOpen,
+  closeCell,
   cell: { value },
   row: {
     original: { id: entryId, isNew }
@@ -60,6 +62,7 @@ function DescriptionCell({
         initialValue={value}
         isNew={isNew}
         ref={inputRef}
+        closeCell={closeCell}
       />
     );
   } else {

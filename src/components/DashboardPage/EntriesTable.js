@@ -88,6 +88,11 @@ function wrapEditableCell(Component) {
       }
     };
 
+    const closeCell = useCallback(
+      () => setSelection({ ...selection, isOpen: false }),
+      [selection, setSelection]
+    );
+
     const isEntrySpecial = entry => entry.isLastOfMonth || entry.isLastOfYear;
 
     return (
@@ -107,7 +112,11 @@ function wrapEditableCell(Component) {
             })}
           ></div>
         )}
-        <Component {...props} isOpen={isSelected && selection.isOpen} />
+        <Component
+          {...props}
+          isOpen={isSelected && selection.isOpen}
+          closeCell={closeCell}
+        />
       </div>
     );
   };
@@ -369,7 +378,7 @@ function EntriesTable({ entries, tableWindowRef }) {
     <PrepareRowsContext.Provider value={{ rows, prepareRow }}>
       <HotKeys
         {...getTableProps()}
-        className="text-sm w-1/2"
+        className="text-sm w-1/2 outline-none"
         data-entries-table
         keyMap={KEY_MAP}
         handlers={KEY_HANDLERS}
