@@ -12,6 +12,12 @@ function DashboardPage({ rawEntries }) {
 
   const tableWindowRef = useRef(null);
 
+  const [selection, selectionSetter] = useState({
+    entryId: null,
+    columnId: null,
+    isOpen: false
+  });
+
   const goToEntryId = useCallback(
     (entryId, columnId = "description", isOpen = false) => {
       const entryIndex = entries.findIndex(entry => entry.id === entryId);
@@ -19,14 +25,8 @@ function DashboardPage({ rawEntries }) {
       document.querySelector("[data-entries-table]").focus();
       selectionSetter({ entryId, columnId, isOpen });
     },
-    [entries, tableWindowRef.current]
+    [entries, selectionSetter, tableWindowRef.current]
   );
-
-  const [selection, selectionSetter] = useState({
-    entryId: null,
-    columnId: null,
-    isOpen: false
-  });
 
   const setSelection = selection => {
     if (selection.entryId) {

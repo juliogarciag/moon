@@ -1,12 +1,15 @@
-import React, { memo } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { sortBy, identity, prop, last } from "ramda";
 import numbro from "numbro";
 import { Link } from "react-feather";
 import getLocalizedMonth from "./getLocalizedMonth";
 
 function TableSidebar({ entries, years, months, todayTotal, goToEntryId }) {
+  const [hasScrolled, setHasScrolled] = useState(false);
+
   const goToMostRecentEntry = () => {
-    const everyCloseness = entries.map(prop("todayCloseness"));
+    const notFutureEntries = entries.filter(entry => !entry.isInTheFuture);
+    const everyCloseness = notFutureEntries.map(prop("todayCloseness"));
     const smallestCloseness = sortBy(identity, everyCloseness)[0];
     const mostRecentEntries = entries.filter(
       entry => entry.todayCloseness === smallestCloseness
@@ -17,6 +20,13 @@ function TableSidebar({ entries, years, months, todayTotal, goToEntryId }) {
       goToEntryId(mostRecentEntry.id);
     }
   };
+
+  useEffect(() => {
+    if (!hasScrolled) {
+      goToMostRecentEntry();
+      setHasScrolled(true);
+    }
+  }, [hasScrolled, goToMostRecentEntry]);
 
   return (
     <div className="py-2 h-screen overflow-auto text-sm border-r border-solid border-black">
