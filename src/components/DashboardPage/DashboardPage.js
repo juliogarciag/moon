@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useState } from "react";
+import React, { useRef, useCallback, useState, useEffect } from "react";
 import { useQuery } from "@apollo/react-hooks";
 import SelectionContext from "./SelectionContext";
 import EntriesTable from "./EntriesTable";
@@ -17,6 +17,18 @@ function DashboardPage({ rawEntries }) {
     columnId: null,
     isOpen: false
   });
+
+  const [newEntryId, setNewEntryId] = useState(null);
+
+  useEffect(() => {
+    if (newEntryId) {
+      const newEntry = entries.find(entry => entry.id === newEntryId);
+      if (newEntry) {
+        goToEntryId(newEntryId, "description", true);
+        setNewEntryId(null);
+      }
+    }
+  }, [entries, newEntryId, setNewEntryId]);
 
   const goToEntryId = useCallback(
     (entryId, columnId = "description", isOpen = false) => {
@@ -39,7 +51,11 @@ function DashboardPage({ rawEntries }) {
   return (
     <SelectionContext.Provider value={{ selection, setSelection }}>
       <div className="flex">
-        <EntriesTable entries={entries} tableWindowRef={tableWindowRef} />
+        <EntriesTable
+          entries={entries}
+          tableWindowRef={tableWindowRef}
+          setNewEntryId={setNewEntryId}
+        />
         <TableSidebar
           entries={entries}
           years={years}

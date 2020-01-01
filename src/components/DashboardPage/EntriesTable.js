@@ -126,7 +126,7 @@ const WrappedAmountCell = wrapEditableCell(AmountCentsCell);
 
 const COLUMNS_ORDER = ["description", "date", "amountCents"];
 
-function EntriesTable({ entries, tableWindowRef }) {
+function EntriesTable({ entries, tableWindowRef, setNewEntryId }) {
   const [hasFirstSelectionHappened, setHasFirstSelectionHappened] = useState(
     false
   );
@@ -187,7 +187,12 @@ function EntriesTable({ entries, tableWindowRef }) {
         id: "actions",
         Cell: props => (
           <div className="flex justify-end">
-            <CreateEntryButton {...props} />
+            <CreateEntryButton
+              {...props}
+              afterCreate={newEntry => {
+                setNewEntryId(newEntry.id);
+              }}
+            />
             <DiscardEntryButton {...props} />
             <ShowHistoryButton {...props} />
           </div>
